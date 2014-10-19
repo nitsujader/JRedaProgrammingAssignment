@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">JRedaProgrammingAssignment</string>
+    <string name="hello_world">Hello world!</string>
+
+    <!--initial button row values-->
+    <string name="add_product_button_label">Create Product</string>
+    <string name="show_product_button_label">Show Product</string>
+
+    <!--add product method values-->
+    <string name="add_product_method_title">How should I add a product?</string>
+    <string name="from_file">From File</string>
+    <string name="enter_manually">Enter Manually</string>
+    <string name="internal_system">Internal Randomizer</string>
+
+    <string name="add_product_method_options_title_default_text">Please select option</string>
+
+</resources>
