@@ -15,5 +15,6 @@
     <string name="internal_system">Internal Randomizer</string>
 
     <string name="add_product_method_options_title_default_text">Please select option</string>
+    <string name="from_sql_db">From SQL Database</string>
 
 </resources>

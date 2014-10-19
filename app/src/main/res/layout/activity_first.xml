@@ -1,138 +1,190 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_first_top_level_LL"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".FirstActivity"
-    android:orientation="vertical"
-    android:id="@+id/activity_first_top_level_LL">
+    tools:context=".FirstActivity">
 
     <LinearLayout
+        android:id="@+id/initial_buttons_row_LL"
+        style="?android:buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="?android:buttonBarButtonStyle"
-        android:background="@color/gray_189"
-        android:id="@+id/initial_buttons_row_LL">
+        android:background="@color/gray_189">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_product_button_label"
             android:id="@+id/add_product_BUT"
-            android:layout_weight="1"
-            style="?android:borderlessButtonStyle"/>
-
-        <Button
+            style="?android:borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/show_product_button_label"
-            android:id="@+id/show_product_BUT"
             android:layout_weight="1"
-            style="?android:borderlessButtonStyle"/>
+            android:text="@string/add_product_button_label" />
+
+        <Button
+            android:id="@+id/show_product_BUT"
+            style="?android:borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="@string/show_product_button_label" />
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/activity_first_main_SV"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/activity_first_main_SV">
+        android:layout_height="match_parent">
+
         <LinearLayout
+            android:id="@+id/activity_first_main_SV_container_LL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/activity_first_main_SV_container_LL"
-            android:orientation="vertical"
-            android:animateLayoutChanges="true">
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/create_product_method_LL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
-                android:id="@+id/create_product_method_LL"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:visibility="visible"
-                android:baselineAligned="false">
+                android:visibility="gone">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:id="@+id/add_product_method_LL"
-                    android:orientation="vertical"
-                    android:background="@color/gray_189"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/half_activity_vertical_margin"
+                    android:layout_weight="1"
+                    android:animateLayoutChanges="true"
+                    android:background="@color/gray_189"
+                    android:orientation="vertical"
                     tools:ignore="RtlHardcoded">
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/add_product_method_title"
                         android:id="@+id/add_product_method_title_TV"
-                        style="@style/TextViewTitle"/>
-                    <RadioGroup
+                        style="@style/TextViewTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/add_product_method_RG">
+                        android:text="@string/add_product_method_title" />
+
+                    <RadioGroup
+                        android:id="@+id/add_product_method_RG"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
                         <RadioButton
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/from_file"
                             android:id="@+id/apm_from_file_RB"
-                            style="@style/TextViewNormal"/>
-                        <RadioButton
+                            style="@style/TextViewNormal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/internal_system"
+                            android:text="@string/from_file" />
+
+                        <RadioButton
                             android:id="@+id/apm_internal_system_RB"
-                            style="@style/TextViewNormal"/>
-                        <RadioButton
+                            style="@style/TextViewNormal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/enter_manually"
+                            android:text="@string/internal_system" />
+
+                        <RadioButton
                             android:id="@+id/apm_enter_manually_RB"
-                            style="@style/TextViewNormal"/>
+                            style="@style/TextViewNormal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enter_manually" />
+
+                        <RadioButton
+                            android:id="@+id/apm_sql_db_RB"
+                            style="@style/TextViewNormal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/from_sql_db" />
                     </RadioGroup>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:id="@+id/add_product_method_options_LL"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/half_activity_vertical_margin"
+                    android:layout_weight="1"
+                    android:animateLayoutChanges="true"
+                    android:background="@color/gray_189"
                     android:orientation="vertical"
                     android:visibility="visible"
-                    android:background="@color/gray_189"
-                    android:layout_marginLeft="@dimen/half_activity_vertical_margin"
                     tools:ignore="RtlHardcoded">
                     <TextView
+                        android:id="@+id/add_product_method_options_title_TV"
+                        style="@style/TextViewTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/add_product_method_options_title_default_text"
-                        android:id="@+id/add_product_method_options_title_TV"
-                        style="@style/TextViewTitle"/>
+                        android:text="@string/add_product_method_options_title_default_text" />
 
                     <LinearLayout
+                        android:id="@+id/from_file_options_LL"
+                        style="?android:borderlessButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/from_file_options_LL"
+                        android:animateLayoutChanges="true"
                         android:orientation="vertical"
-                        style="?android:borderlessButtonStyle">
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="?android:borderlessButtonStyle"
-                            android:text="Load File"/>
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="?android:borderlessButtonStyle"
-                            android:text="Load File"/>
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="?android:borderlessButtonStyle"
-                            android:text="Load File"/>
+                        android:visibility="gone">
 
+                        <Button
+                            style="?android:borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Load File"/>
+                        <Button
+                            style="?android:borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Show File Contents" />
+
+                        <Button
+                            style="?android:borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:enabled="false"
+                            android:text="Create Database" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/internal_randomizer_LL"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <EditText
+                            android:id="@+id/randomizer_entries_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Number of entries"
+                            android:inputType="number" />
+
+                        <EditText
+                            android:id="@+id/randomizer_stores_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Stores per entry"
+                            android:inputType="number" />
+
+                        <Button
+                            android:id="@+id/run_randomizer_BUT"
+                            style="?android:borderlessButtonStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Run" />
                     </LinearLayout>
 
                 </LinearLayout> <!--end add product methods ll-->
@@ -141,18 +193,20 @@
 
 
             <LinearLayout
+                android:id="@+id/show_product_LL"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/show_product_LL"
+                android:animateLayoutChanges="true"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:visibility="visible"
-                android:baselineAligned="false">
+                android:visibility="visible">
+
                 <TextView
+                    style="@style/TextViewTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/add_product_method_options_title_default_text"
-                    style="@style/TextViewTitle"/>
+                    android:text="@string/add_product_method_options_title_default_text" />
             </LinearLayout>
 
 
