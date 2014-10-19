@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +34,11 @@ public class FirstActivity extends Activity {
 
     String MOCK_DATA_FILENAME = "ExampleData.json";
 
-    Button createProductButton;
-    Button showProductButton;
+    Button createProductBUT;
+    Button showProductBUT;
+    Button loadFileBUT;
+    Button showFileContentsBUT;
+    Button createDatabaseBUT;
 
     TextView addProductOptionsTV;
 
@@ -51,6 +55,20 @@ public class FirstActivity extends Activity {
 
     LinearLayout showProductLL;
 
+    Button showFileBUT;
+    LinearLayout fromFileLoadFileOptionsButtonRowLL;
+    ScrollView showFileSV;
+
+    Button loadFromAssetsBUT;
+    Button loadFromWebBUT;
+    TextView showContentsTV;
+    EditText numEntriesET;
+    EditText numStoresET;
+    Button runBUT;
+
+    boolean isDataLoaded = false;
+    String dataString;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,29 +76,47 @@ public class FirstActivity extends Activity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        setupInitialButtonListeners();
+        initializeUI();
     }
 
     /**
      * Initializes the UI elements, initializes variables, adds listeners
      */
-    private void setupInitialButtonListeners() {
-        createProductButton = (Button) findViewById(R.id.add_product_BUT);
-        showProductButton = (Button) findViewById(R.id.show_product_BUT);
+    private void initializeUI() {
+
+        createProductBUT = (Button) findViewById(R.id.add_product_BUT);
+        showProductBUT = (Button) findViewById(R.id.show_product_BUT);
+        createDatabaseBUT = (Button) findViewById(R.id.create_database_BUT);
+        loadFileBUT = (Button) findViewById(R.id.from_file_load_file_BUT);
+        showFileBUT = (Button) findViewById(R.id.from_file_show_contents_BUT);
+        loadFromAssetsBUT = (Button) findViewById(R.id.load_from_file_assets_BUT);
+        loadFromWebBUT = (Button) findViewById(R.id.load_from_file_web_server_BUT);
+        runBUT = (Button) findViewById(R.id.run_randomizer_BUT);
 
         addProductOptionsTV = (TextView) findViewById(R.id.add_product_method_options_title_TV);
+        showContentsTV = (TextView) findViewById(R.id.from_file_show_contents_TV);
 
         initialButtonsRowLL = (LinearLayout) findViewById(R.id.initial_buttons_row_LL);
         createProductMethodLL = (LinearLayout) findViewById(R.id.create_product_method_LL);
         addProductMethodOptionsLL = (LinearLayout) findViewById(R.id.add_product_method_options_LL);
-        importOptionsLLs = new LinearLayout[2];
+        showProductLL = (LinearLayout) findViewById(R.id.show_product_LL);
+        fromFileLoadFileOptionsButtonRowLL = (LinearLayout) findViewById(R.id.from_file_load_file_options_LL);
         fromFileOptionsLL = (LinearLayout) findViewById(R.id.from_file_options_LL);
-        importOptionsLLs[0] = fromFileOptionsLL;
         internalSystemOptionsLL = (LinearLayout) findViewById(R.id.internal_randomizer_LL);
+        enterManuallyLL = (LinearLayout) findViewById(R.id.initial_buttons_row_LL);
+        fromSQLLL = (LinearLayout) findViewById(R.id.initial_buttons_row_LL);
+
+        showFileSV = (ScrollView) findViewById(R.id.from_file_show_contents_SV);
+
+        numEntriesET = (EditText) findViewById(R.id.randomizer_entries_ET);
+        numStoresET = (EditText) findViewById(R.id.randomizer_stores_ET);
+
+        importOptionsLLs = new LinearLayout[2];
+        importOptionsLLs[0] = fromFileOptionsLL;
         importOptionsLLs[1] = internalSystemOptionsLL;
-       /* enterManuallyLL = (LinearLayout)findViewById(R.id.initial_buttons_row_LL);//TODO
+       /* //TODO
         importOptionsLLs[2]=enterManuallyLL;
-        fromSQLLL = (LinearLayout)findViewById(R.id.initial_buttons_row_LL);//TODO
+        //TODO
         importOptionsLLs[3]=fromSQLLL;*/
 
         createProductsMethodsRG = (RadioGroup) findViewById(R.id.add_product_method_RG);
@@ -96,19 +132,104 @@ public class FirstActivity extends Activity {
                     }
                 }
 
+                if (showFileSV.getVisibility() == View.VISIBLE) {
+                    showFileSV.setVisibility(View.GONE);
+                }
+
+                fromFileLoadFileOptionsButtonRowLL.setVisibility(View.GONE);
+
+                if (createDatabaseBUT.getVisibility() == View.VISIBLE) {
+                    createDatabaseBUT.setVisibility(View.GONE);
+                    dataString = null;
+                    isDataLoaded = false;
+                }
+
                 switch (checkedId) {
                     case R.id.apm_from_file_RB: // from file
-                        //TODO: change the title of the section
+                        addProductOptionsTV.setText("Select option");
                         fromFileOptionsLL.setVisibility(View.VISIBLE);
+
+                        if (isDataLoaded) {
+                            showFileBUT.setEnabled(true);
+                        } else {
+                            showFileBUT.setEnabled(false);
+                        }
+
+                        loadFileBUT.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (showFileSV.getVisibility() == View.VISIBLE) {
+                                    showFileSV.setVisibility(View.GONE);
+                                }
+                                fromFileLoadFileOptionsButtonRowLL.setVisibility(View.VISIBLE);
+
+                                loadFromAssetsBUT.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
+                                        showFileBUT.setEnabled(true);
+                                        showContentsTV.setText(dataString);
+                                        createDatabaseBUT.setVisibility(View.VISIBLE);
+
+
+                                        dataString = (runRandomizer(4, 3)).toString();
+                                        if (dataString != null) {
+                                            isDataLoaded = true;
+                                            createDatabaseBUT.setVisibility(View.VISIBLE);
+                                            Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+
+                                loadFromWebBUT.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
+                                        showFileBUT.setEnabled(true);
+                                        showContentsTV.setText(dataString);
+                                        createDatabaseBUT.setVisibility(View.VISIBLE);
+
+                                        dataString = (runRandomizer(4, 3)).toString();
+                                        if (dataString != null) {
+                                            isDataLoaded = true;
+                                            createDatabaseBUT.setVisibility(View.VISIBLE);
+                                            Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+
+                            }
+                        });
+
+                        showFileBUT.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (fromFileLoadFileOptionsButtonRowLL.getVisibility() == View.VISIBLE) {
+                                    fromFileLoadFileOptionsButtonRowLL.setVisibility(View.GONE);
+                                }
+                                if (showFileSV.getVisibility() == View.VISIBLE) {
+                                    showFileSV.setVisibility(View.GONE);
+                                } else {
+                                    showFileSV.setVisibility(View.VISIBLE);
+                                }
+
+                                if (isDataLoaded) {
+                                    showContentsTV.setText(dataString);
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Data not loaded!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
 
                         break;
                     case R.id.apm_internal_system_RB: // internal randomizer
                         addProductOptionsTV.setText("Please enter values below");
                         internalSystemOptionsLL.setVisibility(View.VISIBLE);
 
-                        final EditText numEntriesET = (EditText) findViewById(R.id.randomizer_entries_ET);
-                        final EditText numStoresET = (EditText) findViewById(R.id.randomizer_stores_ET);
-                        final Button runBUT = (Button) findViewById(R.id.run_randomizer_BUT);
                         runBUT.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -128,8 +249,14 @@ public class FirstActivity extends Activity {
                                     numStoresET.setText("" + stores);
                                 }
 
-                                runRandomizer(entries, stores);
-                                Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+                                dataString = (runRandomizer(entries, stores)).toString();
+                                if (dataString != null) {
+                                    isDataLoaded = true;
+                                    createDatabaseBUT.setVisibility(View.VISIBLE);
+                                    Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
 
@@ -143,7 +270,7 @@ public class FirstActivity extends Activity {
         });
 
 
-        createProductButton.setOnClickListener(new View.OnClickListener() {
+        createProductBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //real functionality
@@ -151,26 +278,33 @@ public class FirstActivity extends Activity {
                     showProductLL.setVisibility(View.GONE);
                 }
                 createProductMethodLL.setVisibility(View.VISIBLE);
-
             }
         });
 
 
-        showProductButton.setOnClickListener(new View.OnClickListener() {
+        showProductBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                runRandomizer(3, 4);
+                //open show products activity
             }
         });
 
-        showProductLL = (LinearLayout) findViewById(R.id.show_product_LL);
+        createDatabaseBUT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
+                showProductBUT.setEnabled(true);
+                Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         /*Dictionary<String, Integer> storesDictionary;
         storesDictionary = new Hashtable<String, Integer>();
         storesDictionary.*/
     }
 
-    private void runRandomizer(int numEntries, int numStores) {
+    private JSONArray runRandomizer(int numEntries, int numStores) {
         try {
 
             double priceMin = 15.00;
@@ -220,12 +354,13 @@ public class FirstActivity extends Activity {
                 itemsArray.put(item);
             }
 
-            Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, itemsArray.toString());
-            showProductButton.setEnabled(true);
-
+            dataString = itemsArray.toString();
+            isDataLoaded = true;
+            return itemsArray;
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
@@ -230,6 +231,29 @@ public class Utilities {
             InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    public static String getStringFromAsset(Context context, String assetPathName) {
+        StringBuilder buf = new StringBuilder();
+        InputStream inputStream;
+        if (context != null) {
+            try {
+                inputStream = context.getAssets().open(assetPathName);
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                String str;
+
+                while ((str = in.readLine()) != null) {
+                    buf.append(str);
+                }
+
+                in.close();
+                return buf.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     /**
