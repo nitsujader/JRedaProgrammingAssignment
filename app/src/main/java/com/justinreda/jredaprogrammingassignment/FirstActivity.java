@@ -167,14 +167,12 @@ public class FirstActivity extends Activity {
                                     @Override
                                     public void onClick(View v) {
                                         Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
-                                        showFileBUT.setEnabled(true);
-                                        showContentsTV.setText(dataString);
-                                        createDatabaseBUT.setVisibility(View.VISIBLE);
 
-
-                                        dataString = (runRandomizer(4, 3)).toString();
+                                        dataString = Utilities.getStringFromAsset(getApplicationContext(), MOCK_DATA_FILENAME);
                                         if (dataString != null) {
+                                            showContentsTV.setText(dataString);
                                             isDataLoaded = true;
+                                            showFileBUT.setEnabled(true);
                                             createDatabaseBUT.setVisibility(View.VISIBLE);
                                             Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
                                         } else {
@@ -187,13 +185,12 @@ public class FirstActivity extends Activity {
                                     @Override
                                     public void onClick(View v) {
                                         Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
-                                        showFileBUT.setEnabled(true);
-                                        showContentsTV.setText(dataString);
-                                        createDatabaseBUT.setVisibility(View.VISIBLE);
 
-                                        dataString = (runRandomizer(4, 3)).toString();
+                                        dataString = Utilities.getStringFromURL("https://www.dropbox.com/s/nb0he3qki83ql73/ExampleData.json?dl=0");
                                         if (dataString != null) {
+                                            showContentsTV.setText(dataString);
                                             isDataLoaded = true;
+                                            showFileBUT.setEnabled(true);
                                             createDatabaseBUT.setVisibility(View.VISIBLE);
                                             Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
                                         } else {
@@ -253,6 +250,7 @@ public class FirstActivity extends Activity {
                                 if (dataString != null) {
                                     isDataLoaded = true;
                                     createDatabaseBUT.setVisibility(View.VISIBLE);
+                                    createDatabaseBUT.setEnabled(true);
                                     Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
