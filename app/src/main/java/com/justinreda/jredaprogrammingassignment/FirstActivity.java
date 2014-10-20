@@ -1,8 +1,12 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.pm.ActivityInfo;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +19,8 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.LinkedList;
 
 /**
  * Created by Justin on 10/19/2014.
@@ -68,6 +74,7 @@ public class FirstActivity extends Activity {
 
     boolean isDataLoaded = false;
     String dataString;
+    LinkedList<Product> productsList = new LinkedList<Product>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,9 +173,9 @@ public class FirstActivity extends Activity {
                                 loadFromAssetsBUT.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
 
-                                        dataString = Utilities.getStringFromAsset(getApplicationContext(), MOCK_DATA_FILENAME);
+                                        dataString = Utilities.getStringFromAsset(getApplicationContext(), ""+MOCK_DATA_FILENAME);
                                         if (dataString != null) {
                                             showContentsTV.setText(dataString);
                                             isDataLoaded = true;
@@ -184,18 +191,39 @@ public class FirstActivity extends Activity {
                                 loadFromWebBUT.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
 
-                                        dataString = Utilities.getStringFromURL("https://www.dropbox.com/s/nb0he3qki83ql73/ExampleData.json?dl=0");
-                                        if (dataString != null) {
-                                            showContentsTV.setText(dataString);
-                                            isDataLoaded = true;
-                                            showFileBUT.setEnabled(true);
-                                            createDatabaseBUT.setVisibility(View.VISIBLE);
-                                            Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
-                                        }
+                                        Thread thread = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                //TODO: show loading dialog
+                                                dataString = Utilities.getStringFromURL("https://www.dropbox.com/s/nb0he3qki83ql73/ExampleData.json?dl=1");
+
+                                                if (dataString != null) {
+                                                    showContentsTV.setText(dataString);
+                                                    isDataLoaded = true;
+                                                    Handler handler = new Handler(getMainLooper());
+                                                    handler.post(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            showFileBUT.setEnabled(true);
+                                                            createDatabaseBUT.setVisibility(View.VISIBLE);
+                                                            Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+
+                                                } else {
+                                                    Handler handler = new Handler(getMainLooper());
+                                                    handler.post(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                        thread.start();
                                     }
                                 });
 
@@ -290,6 +318,7 @@ public class FirstActivity extends Activity {
         createDatabaseBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                createDatabase(dataString);
                 Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
                 showProductBUT.setEnabled(true);
                 Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
@@ -302,6 +331,52 @@ public class FirstActivity extends Activity {
         storesDictionary.*/
     }
 
+    private void createDatabase(String dataIn){
+        try {
+            JSONArray productsArray = new JSONArray(dataIn);
+            int numFoundProducts = productsArray.length();
+
+            ProductDatabaseHelper productDatabaseHelper = new ProductDatabaseHelper(getApplicationContext());
+            SQLiteDatabase db = productDatabaseHelper.getWritableDatabase();
+
+            for (int i=0;i<numFoundProducts;i++){
+                Product newProduct = new Product(productsArray.getJSONObject(i));
+                Log.wtf("FirstActivity","adding "+newProduct.toString());
+                ProductDatabaseHelper.insertItemIntoDB(newProduct, db);
+            }
+
+            LinkedList<Product> database = ProductDatabaseHelper.getWholeDatabase(db);
+            for(Product product: database){
+                Log.wtf("FirstActivity123",product.toString());
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private LinkedList<String> getImageNames(){
+        LinkedList<String> imageNames = new LinkedList<String>();
+        imageNames.add("1");
+        imageNames.add("2");
+        imageNames.add("3");
+        imageNames.add("4");
+        imageNames.add("5");
+        imageNames.add("6");
+        imageNames.add("7");
+        imageNames.add("8");
+        imageNames.add("9");
+        imageNames.add("0");
+
+        for (String name: imageNames){
+            Log.wtf("FirstActivity",name);
+        }
+
+        return imageNames;
+    }
+
     private JSONArray runRandomizer(int numEntries, int numStores) {
         try {
 
@@ -309,6 +384,8 @@ public class FirstActivity extends Activity {
             double priceMax = 99.99;
             int stockMin = 0;
             int stockMax = 15;
+
+            LinkedList<String> imageNames = getImageNames();
 
             JSONArray itemsArray = new JSONArray();
             for (int i = 0; i < numEntries; i++) {
@@ -324,19 +401,20 @@ public class FirstActivity extends Activity {
                 randomSale = Utilities.truncateDouble(randomSale, 2);
                 item.put(FIELD_REGULAR_PRICE, randomRegular);
                 item.put(FIELD_SALE_PRICE, randomSale);
-
                 item.put(FIELD_PRODUCT_IMAGE, "Image Name " + i);
 
+                int numColorsToPick = 4;
+                String[] colors = {"Red","Blue","Green","Black","Yellow","Orange","Gold","Silver","Chrome"};
                 JSONArray colorsArray = new JSONArray();
-                colorsArray.put("Red");
-                colorsArray.put("Blue");
-                colorsArray.put("Green");
-                colorsArray.put("Black");
-                colorsArray.put("Yellow");
-                colorsArray.put("Orange");
-                if (i % 2 == 0) colorsArray.put("Gold");
-                if (i % 2 == 0) colorsArray.put("Silver");
-                if (i % 2 == 0) colorsArray.put("Chrome");
+                LinkedList<Integer> pickedColors = new LinkedList<Integer>();
+                for(int j=0;j<numColorsToPick;j++){
+                    int pickedNum = Utilities.getRandomIntInRange(0,8);
+                    while(pickedColors.contains(pickedNum)){
+                        pickedNum = Utilities.getRandomIntInRange(0,8);
+                    }
+                    pickedColors.add(pickedNum);
+                    colorsArray.put(colors[pickedNum]);
+                }
                 item.put(FIELD_COLORS, colorsArray);
 
                 JSONArray storesArray = new JSONArray();

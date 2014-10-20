@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -238,6 +239,7 @@ public class Utilities {
         InputStream inputStream;
         if (context != null) {
             try {
+                //Log.wtf(TAG, Arrays.toString(context.getResources().getAssets().list("")));
                 inputStream = context.getAssets().open(assetPathName);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
@@ -248,6 +250,8 @@ public class Utilities {
                 }
 
                 in.close();
+                //Log.wtf(TAG, buf.toString());
+
                 return buf.toString();
             } catch (IOException e) {
                 e.printStackTrace();

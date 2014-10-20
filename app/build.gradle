@@ -17,8 +17,32 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            manifest {
+                srcFile '../app/src/main/AndroidManifest.xml'
+            }
+            java {
+                srcDir '../app/src/main/java'
+            }
+            res {
+                srcDir '../app/src/main/res'
+            }
+            assets {
+                srcDir '../app/assets'
+            }
+            resources {
+                srcDir '../app/src/main/src'
+            }
+            aidl {
+                srcDir '../app/src'
+            }
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+
