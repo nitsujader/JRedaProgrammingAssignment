@@ -20,7 +20,6 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -32,6 +31,9 @@ import java.util.Random;
 @SuppressWarnings("unused")
 public class Utilities {
 
+    /**
+     * Utilities
+     */
     static String TAG = "Utilities";
 
     /**
@@ -203,16 +205,37 @@ public class Utilities {
         return stringText;
     }
 
+    /**
+     * Returns a random integer value between min and max
+     *
+     * @param min minimum integer value
+     * @param max maximum integer value
+     * @return random integer within provided range
+     */
     public static int getRandomIntInRange(int min, int max) {
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
     }
 
+    /**
+     * Returns a random double value between min and max
+     *
+     * @param min minimum double value
+     * @param max maximum double value
+     * @return random double within provided range
+     */
     public static double getRandomDoubleInRange(double min, double max) {
         Random random = new Random();
         return (min + (max - min) * random.nextDouble());
     }
 
+    /**
+     * Given an input double, will truncate it to a specified amount of places. It will round up from 5.
+     *
+     * @param inputNumber input double to be truncated
+     * @param places number of places after the decimal to leave
+     * @return the newly truncated rounded decimal value
+     */
     public static double truncateDouble(double inputNumber, int places) {
         String pattern = "#.";
         for (int i = 0; i < places; i++) {
@@ -222,11 +245,24 @@ public class Utilities {
         return Double.valueOf(twoDForm.format(inputNumber));
     }
 
+    /**
+     * Returns a random float value between min and max
+     *
+     * @param min minimum float value
+     * @param max maximum float value
+     * @return random float within provided range
+     */
     public static float getRandomFloatInRange(float min, float max) {
         Random random = new Random();
         return (min + (max - min) * random.nextFloat());
     }
 
+    /**
+     * Hides the soft keyboard when called from a listener or view.
+     *
+     * @param context application context
+     * @param view view which would trigger the action. ex) Button1
+     */
     public static void hideKeyboard(Context context, View view) {
         if (context != null && view != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -234,6 +270,14 @@ public class Utilities {
         }
     }
 
+    /**
+     * Returns the string contents of a text file from the assets directory
+     * (PROJECT > MODULE > assets). Assets folder should be as same level as build.
+     *
+     * @param context application context
+     * @param assetPathName full path and filename to target file, excluding "assets"
+     * @return string contents of target file
+     */
     public static String getStringFromAsset(Context context, String assetPathName) {
         StringBuilder buf = new StringBuilder();
         InputStream inputStream;
@@ -266,7 +310,7 @@ public class Utilities {
      * @param filename file which you want to be retrieved. A string is expected. Ex) "file.txt"
      * @return the contents of the file as a String
      */
-    private String readDownloadSTRFile(String filename) {
+    public static String readDownloadSTRFile(String filename) {
         File[] downloadFiles = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).listFiles();
         File goodFile = null;
 
@@ -293,6 +337,33 @@ public class Utilities {
             e.printStackTrace();
         }
         return text.toString();
+    }
+
+    /**
+     * This method will take an input double, truncate it to two decimal places, then ensure
+     * currency formatting.
+     * Ex) input 4.5 output $4.50
+     * Ex) input 54.65475 output $54.65
+     * Ex) input 1 output $1.00
+     *
+     * @param value double currency value
+     * @return currency formatted string version of input
+     */
+    @SuppressWarnings("StatementWithEmptyBody")
+    public static String readDoubleAsCurrency(Double value) {
+        String fixedChargeValue = "" + truncateDouble(value, 2);
+        if (fixedChargeValue.indexOf(".") == fixedChargeValue.length() - 3) {
+            //should be in the right spot ex 5.99
+        }
+        if (fixedChargeValue.indexOf(".") == fixedChargeValue.length() - 2) {
+            //add one zero ex 5.9
+            fixedChargeValue += "0";
+        }
+        if (fixedChargeValue.indexOf(".") == fixedChargeValue.length() - 1) {
+            //add 2 zeros ex 5.
+            fixedChargeValue += "00";
+        }
+        return "$" + fixedChargeValue;
     }
 
 }
