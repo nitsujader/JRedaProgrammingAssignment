@@ -1,6 +1,7 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -36,7 +37,6 @@ public class FirstActivity extends Activity {
     String FIELD_STORES = "stores";
     String FIELD_STORES_NUMBER = "store_number";
     String FIELD_STORES_STOCK = "store_stock";
-
     String MOCK_DATA_FILENAME = "ExampleData.json";
 
     Button createProductBUT;
@@ -44,8 +44,14 @@ public class FirstActivity extends Activity {
     Button loadFileBUT;
     Button showContentsBUT;
     Button createDatabaseBUT;
+    Button showFileBUT;
+    Button loadFromAssetsBUT;
+    Button loadFromWebBUT;
+    Button runBUT;
+    Button meAddProductBUT, meNewProductBUT;
 
     TextView addProductOptionsTV;
+    TextView showContentsTV;
 
     LinearLayout initialButtonsRowLL;
     LinearLayout createProductMethodLL;
@@ -53,25 +59,23 @@ public class FirstActivity extends Activity {
     LinearLayout fromFileOptionsLL;
     LinearLayout internalSystemOptionsLL;
     LinearLayout enterManuallyLL;
+    LinearLayout showProductLL;
+    LinearLayout fromFileLoadFileOptionsButtonRowLL;
     LinearLayout[] importOptionsLLs;
 
     RadioGroup createProductsMethodsRG;
 
-    LinearLayout showProductLL;
-
-    Button showFileBUT;
-    LinearLayout fromFileLoadFileOptionsButtonRowLL;
     ScrollView showFileSV;
 
-    Button loadFromAssetsBUT;
-    Button loadFromWebBUT;
-    TextView showContentsTV;
     EditText numEntriesET;
     EditText numStoresET;
-    Button runBUT;
+    //manual entry fields
+    EditText meNameET, meDescriptionET, meRegPriceET, meSalePriceET, meNumColorsET, meNumStoresET;
 
     boolean isDataLoaded = false;
     String dataString;
+    JSONArray manualEntries;
+
     LinkedList<Product> productsList = new LinkedList<Product>();
 
     @Override
@@ -99,6 +103,8 @@ public class FirstActivity extends Activity {
         loadFromAssetsBUT = (Button) findViewById(R.id.load_from_file_assets_BUT);
         loadFromWebBUT = (Button) findViewById(R.id.load_from_file_web_server_BUT);
         runBUT = (Button) findViewById(R.id.run_randomizer_BUT);
+        meAddProductBUT = (Button) findViewById(R.id.manual_product_add_BUT);
+        meNewProductBUT = (Button) findViewById(R.id.manual_product_new_BUT);
 
         addProductOptionsTV = (TextView) findViewById(R.id.add_product_method_options_title_TV);
         showContentsTV = (TextView) findViewById(R.id.from_file_show_contents_TV);
@@ -116,6 +122,13 @@ public class FirstActivity extends Activity {
 
         numEntriesET = (EditText) findViewById(R.id.randomizer_entries_ET);
         numStoresET = (EditText) findViewById(R.id.randomizer_stores_ET);
+        //Manual entry fields
+        meNameET = (EditText) findViewById(R.id.manual_product_name_ET);
+        meDescriptionET = (EditText) findViewById(R.id.manual_product_description_ET);
+        meRegPriceET = (EditText) findViewById(R.id.manual_product_reg_price_ET);
+        meSalePriceET = (EditText) findViewById(R.id.manual_product_sale_price_ET);
+        meNumColorsET = (EditText) findViewById(R.id.manual_product_num_colors_ET);
+        meNumStoresET = (EditText) findViewById(R.id.manual_product_num_stores_ET);
 
         importOptionsLLs = new LinearLayout[3];
         importOptionsLLs[0] = fromFileOptionsLL;
@@ -172,7 +185,7 @@ public class FirstActivity extends Activity {
                                     public void onClick(View v) {
                                         //Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
 
-                                        dataString = Utilities.getStringFromAsset(getApplicationContext(), ""+MOCK_DATA_FILENAME);
+                                        dataString = Utilities.getStringFromAsset(getApplicationContext(), "" + MOCK_DATA_FILENAME);
                                         if (dataString != null) {
                                             showContentsTV.setText(dataString);
                                             isDataLoaded = true;
@@ -246,7 +259,7 @@ public class FirstActivity extends Activity {
                                 }
                             }
                         });
-
+                        clearManualFields();
                         break;
                     case R.id.apm_internal_system_RB: // internal randomizer
                         addProductOptionsTV.setText("Please enter values below");
@@ -282,7 +295,7 @@ public class FirstActivity extends Activity {
                                 }
                             }
                         });
-
+                        clearManualFields();
                         break;
 
                     case R.id.apm_enter_manually_RB: // enter manually
@@ -299,7 +312,7 @@ public class FirstActivity extends Activity {
         createProductBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //real functionality
+                productsList = null;//null out any old info
                 if (showProductLL.getVisibility() == View.VISIBLE) {
                     showProductLL.setVisibility(View.GONE);
                 }
@@ -311,24 +324,104 @@ public class FirstActivity extends Activity {
         showProductBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Utilities.hideKeyboard(getApplicationContext(), showProductBUT);
                 //open show products activity
+                Bundle baggage = new Bundle();
+                baggage.putString("datastr", dataString);
+                Intent intent = new Intent(getApplicationContext(), ShowProductsActivity.class);
+                intent.putExtra("dataset", baggage);
+                startActivity(intent);
             }
         });
 
         createDatabaseBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (dataString == null) {
+                    if (manualEntries != null) {
+                        dataString = manualEntries.toString();
+                    }
+                }
+                Utilities.hideKeyboard(getApplicationContext(), createDatabaseBUT);
                 createDatabase(dataString);
-//                Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
                 showProductBUT.setEnabled(true);
-                Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Database created!", Toast.LENGTH_SHORT).show();
             }
         });
 
+        meAddProductBUT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkManualFields()) {
+                    JSONObject newJSONProduct = hybridCreateProduct(
+                            Integer.parseInt(meNumColorsET.getText().toString()),
+                            Integer.parseInt(meNumStoresET.getText().toString()));
 
-        /*Dictionary<String, Integer> storesDictionary;
-        storesDictionary = new Hashtable<String, Integer>();
-        storesDictionary.*/
+                    Product newProduct = new Product(newJSONProduct);
+                    if (manualEntries == null) {
+                        manualEntries = new JSONArray();
+                    }
+                    if (productsList == null) {
+                        productsList = new LinkedList<Product>();
+                        productsList.add(newProduct);
+                        manualEntries.put(newJSONProduct);
+                        createDatabaseBUT.setEnabled(true);
+                        createDatabaseBUT.setVisibility(View.VISIBLE);
+
+                    } else {
+                        boolean foundMatch = false;
+                        for (Product product : productsList) {
+                            if (product.getName().matches(newProduct.getName())) {
+                                foundMatch = true;
+                            }
+                        }
+                        if (!foundMatch) {
+                            productsList.add(newProduct);
+                            manualEntries.put(newJSONProduct);
+                            createDatabaseBUT.setEnabled(true);
+                            createDatabaseBUT.setVisibility(View.VISIBLE);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Entry already in database!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+        });
+
+        meNewProductBUT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearManualFields();
+            }
+        });
+    }
+
+    private void clearManualFields() {
+        meNameET.setText("");
+        meDescriptionET.setText("");
+        meRegPriceET.setText("");
+        meSalePriceET.setText("");
+        meNumColorsET.setText("");
+        meNumStoresET.setText("");
+    }
+
+    private boolean checkManualFields() {
+
+        if (Utilities.etNotNullNotEmpty(meNameET)) {
+            if (Utilities.etNotNullNotEmpty(meDescriptionET)) {
+                if (Utilities.etNotNullNotEmpty(meRegPriceET)) {
+                    if (Utilities.etNotNullNotEmpty(meSalePriceET)) {
+                        if (Utilities.etNotNullNotEmpty(meNumColorsET)) {
+                            if (Utilities.etNotNullNotEmpty(meNumStoresET)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Toast.makeText(getApplicationContext(), "All fields required!", Toast.LENGTH_SHORT).show();
+        return false;
     }
 
     private LinkedList<Product> createDatabase(String dataIn) {
@@ -365,9 +458,9 @@ public class FirstActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        productsList = database;
         return database;
     }
-
 
     private LinkedList<String> getImageNames(){
         LinkedList<String> imageNames = new LinkedList<String>();
@@ -381,10 +474,6 @@ public class FirstActivity extends Activity {
         imageNames.add("8");
         imageNames.add("9");
         imageNames.add("0");
-
-        for (String name: imageNames){
-            //Log.wtf("FirstActivity",name);
-        }
 
         return imageNames;
     }
@@ -413,7 +502,8 @@ public class FirstActivity extends Activity {
                 randomSale = Utilities.truncateDouble(randomSale, 2);
                 item.put(FIELD_REGULAR_PRICE, randomRegular);
                 item.put(FIELD_SALE_PRICE, randomSale);
-                item.put(FIELD_PRODUCT_IMAGE, "Image Name " + i);
+                int randomPicID = Utilities.getRandomIntInRange(0, 9);
+                item.put(FIELD_PRODUCT_IMAGE, "imagename_" + randomPicID);
 
                 int numColorsToPick = 4;
                 String[] colors = {"Red","Blue","Green","Black","Yellow","Orange","Gold","Silver","Chrome"};
@@ -445,6 +535,63 @@ public class FirstActivity extends Activity {
             dataString = itemsArray.toString();
             isDataLoaded = true;
             return itemsArray;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private JSONObject hybridCreateProduct(int numColors, int numStores) {
+        try {
+
+            String name = meNameET.getText().toString();
+            String description = meDescriptionET.getText().toString();
+            Double regPrice = Utilities.truncateDouble(Double.parseDouble(meRegPriceET.getText().toString()), 2);
+            Double salePrice = Utilities.truncateDouble(Double.parseDouble(meSalePriceET.getText().toString()), 2);
+
+            int stockMin = 0;
+            int stockMax = 15;
+
+            LinkedList<String> imageNames = getImageNames();
+            int randomPicID = Utilities.getRandomIntInRange(0, 9);
+            int startId = 0;
+            if (productsList != null) {
+                startId = productsList.size();
+            }
+            JSONObject item = new JSONObject();
+
+            item.put(FIELD_ID, startId);
+            item.put(FIELD_NAME, name);
+            item.put(FIELD_DESCRIPTION, description);
+
+            item.put(FIELD_REGULAR_PRICE, regPrice);
+            item.put(FIELD_SALE_PRICE, salePrice);
+            item.put(FIELD_PRODUCT_IMAGE, "imagename_" + randomPicID);
+
+            String[] colors = {"Red", "Blue", "Green", "Black", "Yellow", "Orange", "Gold", "Silver", "Chrome"};
+            JSONArray colorsArray = new JSONArray();
+            LinkedList<Integer> pickedColors = new LinkedList<Integer>();
+            for (int j = 0; j < numColors; j++) {
+                int pickedNum = Utilities.getRandomIntInRange(0, 8);
+                while (pickedColors.contains(pickedNum)) {
+                    pickedNum = Utilities.getRandomIntInRange(0, 8);
+                }
+                pickedColors.add(pickedNum);
+                colorsArray.put(colors[pickedNum]);
+            }
+            item.put(FIELD_COLORS, colorsArray);
+
+            JSONArray storesArray = new JSONArray();
+            for (int j = 0; j < numStores; j++) {
+                JSONObject store = new JSONObject();
+                store.put(FIELD_STORES_NUMBER, "Store " + j);
+                int randomStock = Utilities.getRandomIntInRange(stockMin, stockMax);
+                store.put(FIELD_STORES_STOCK, randomStock);
+                storesArray.put(store);
+            }
+            item.put(FIELD_STORES, storesArray);
+
+            return item;
         } catch (JSONException e) {
             e.printStackTrace();
         }

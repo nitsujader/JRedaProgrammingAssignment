@@ -59,6 +59,14 @@ public class Product {
         }
     }
 
+    public Product(String name, String description, double regularPrice, double salePrice, String productImage, int numColors, int numStores) {
+        this.name = name;
+        this.description = description;
+        this.regularPrice = regularPrice;
+        this.salePrice = salePrice;
+        this.productImage = productImage;
+    }
+
     public Product(Cursor cursor) {
         /*for (String name: cursor.getColumnNames()){
             Log.wtf("PRODUCT", "id CN "+cursor.moveToFirst());

@@ -136,14 +136,15 @@
                             style="?android:borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Load File"/>
+                            android:text="@string/load_file" />
+
                         <Button
                             android:id="@+id/from_file_show_contents_BUT"
                             style="?android:borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:enabled="false"
-                            android:text="Show File Contents" />
+                            android:text="@string/show_file_contents" />
 
 
                     </LinearLayout>
@@ -160,14 +161,14 @@
                             android:id="@+id/randomizer_entries_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Number of entries"
+                            android:hint="@string/num_entries"
                             android:inputType="number" />
 
                         <EditText
                             android:id="@+id/randomizer_stores_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Stores per entry"
+                            android:hint="@string/num_stores"
                             android:inputType="number" />
 
                         <Button
@@ -175,7 +176,7 @@
                             style="?android:borderlessButtonStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Run" />
+                            android:text="@string/run" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -191,28 +192,28 @@
                             android:id="@+id/manual_product_name_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Name"
+                            android:hint="@string/name"
                             android:inputType="textPersonName" />
 
                         <EditText
                             android:id="@+id/manual_product_description_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Description"
+                            android:hint="@string/description"
                             android:inputType="text" />
 
                         <EditText
                             android:id="@+id/manual_product_reg_price_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Regular Price"
+                            android:hint="@string/reg_price"
                             android:inputType="numberDecimal" />
 
                         <EditText
                             android:id="@+id/manual_product_sale_price_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Sale Price"
+                            android:hint="@string/sale_price"
                             android:inputType="numberDecimal" />
 
                         <TextView
@@ -220,20 +221,20 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Available colors and store stock information will be automatically populated based on input below" />
+                            android:text="@string/manual_entry_disclaimer" />
 
                         <EditText
                             android:id="@+id/manual_product_num_colors_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Number of colors"
+                            android:hint="@string/num_colors"
                             android:inputType="number" />
 
                         <EditText
                             android:id="@+id/manual_product_num_stores_ET"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Number of stores"
+                            android:hint="@string/num_stores"
                             android:inputType="number" />
 
                         <LinearLayout
@@ -248,7 +249,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Add" />
+                                android:text="@string/add" />
 
                             <Button
                                 android:id="@+id/manual_product_new_BUT"
@@ -256,7 +257,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="New" />
+                                android:text="@string/str_new" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -282,7 +283,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="From assets" />
+                    android:text="@string/from_assets" />
 
                 <Button
                     android:id="@+id/load_from_file_web_server_BUT"
@@ -290,7 +291,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="From web server" />
+                    android:text="@string/from_web_server" />
 
             </LinearLayout>
 
@@ -300,9 +301,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:ignore="NestedScrolling">
 
-                <LinearLayout
+            <LinearLayout
                     android:id="@+id/from_file_show_contents_LL"
                     style="?android:borderlessButtonStyle"
                     android:layout_width="match_parent"
@@ -330,7 +332,7 @@
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
                 android:background="@color/gray_189"
                 android:enabled="true"
-                android:text="Create Database"
+                android:text="@string/create_database"
                 android:visibility="gone" />
 
             <LinearLayout
