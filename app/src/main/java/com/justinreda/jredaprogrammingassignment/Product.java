@@ -2,18 +2,18 @@ package com.justinreda.jredaprogrammingassignment;
 
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 
 /**
  * Created by Justin on 10/19/2014.
  */
-public class Product {
+public class Product implements Serializable {
 
     String FIELD_ID = "id";
     String FIELD_NAME = "name";
@@ -59,19 +59,8 @@ public class Product {
         }
     }
 
-    public Product(String name, String description, double regularPrice, double salePrice, String productImage, int numColors, int numStores) {
-        this.name = name;
-        this.description = description;
-        this.regularPrice = regularPrice;
-        this.salePrice = salePrice;
-        this.productImage = productImage;
-    }
-
     public Product(Cursor cursor) {
-        /*for (String name: cursor.getColumnNames()){
-            Log.wtf("PRODUCT", "id CN "+cursor.moveToFirst());
-            Log.wtf("PRODUCT", "name index "+cursor.getColumnIndexOrThrow(FIELD_NAME));
-        }*/
+
         try {
             this.id = cursor.getInt(0);
             this.name = cursor.getString(cursor.getColumnIndexOrThrow(FIELD_NAME));
@@ -86,7 +75,6 @@ public class Product {
             }
             this.stores = new Hashtable<String, Integer>();
             JSONArray storez = new JSONArray(cursor.getString(cursor.getColumnIndex(FIELD_STORES)));
-            //Log.wtf("PRODUCT","stores "+storez.toString());
             for(int j=0; j<storez.length();j++){
                 JSONObject storeObject = storez.getJSONObject(j);
                 this.stores.put(FIELD_STORES_NUMBER,storeObject.getInt(FIELD_STORES_STOCK));
@@ -169,13 +157,11 @@ public class Product {
             JSONArray arrayOut = new JSONArray();
             for (String s : stores.keySet()) {
                 JSONObject tempObject = new JSONObject();
-                String storeName = s;
-                tempObject.put(FIELD_STORES_NUMBER, storeName);
-                tempObject.put(FIELD_STORES_STOCK, stores.get(storeName));
+                tempObject.put(FIELD_STORES_NUMBER, s);
+                tempObject.put(FIELD_STORES_STOCK, stores.get(s));
                 arrayOut.put(tempObject);
             }
 
-            Log.wtf("PRODUCT", "storez " + arrayOut.toString());
             return arrayOut;
         } catch (JSONException e) {
             e.printStackTrace();

@@ -1,9 +1,11 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -20,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -27,6 +30,7 @@ import java.util.LinkedList;
  */
 public class FirstActivity extends Activity {
 
+    public static HashMap<String, Drawable> imagesMap = new HashMap<String, Drawable>();
     String FIELD_ID = "id";
     String FIELD_NAME = "name";
     String FIELD_DESCRIPTION = "description";
@@ -38,7 +42,6 @@ public class FirstActivity extends Activity {
     String FIELD_STORES_NUMBER = "store_number";
     String FIELD_STORES_STOCK = "store_stock";
     String MOCK_DATA_FILENAME = "ExampleData.json";
-
     Button createProductBUT;
     Button showProductBUT;
     Button loadFileBUT;
@@ -49,10 +52,8 @@ public class FirstActivity extends Activity {
     Button loadFromWebBUT;
     Button runBUT;
     Button meAddProductBUT, meNewProductBUT;
-
     TextView addProductOptionsTV;
     TextView showContentsTV;
-
     LinearLayout initialButtonsRowLL;
     LinearLayout createProductMethodLL;
     LinearLayout addProductMethodOptionsLL;
@@ -62,21 +63,51 @@ public class FirstActivity extends Activity {
     LinearLayout showProductLL;
     LinearLayout fromFileLoadFileOptionsButtonRowLL;
     LinearLayout[] importOptionsLLs;
-
     RadioGroup createProductsMethodsRG;
-
     ScrollView showFileSV;
-
     EditText numEntriesET;
     EditText numStoresET;
     //manual entry fields
     EditText meNameET, meDescriptionET, meRegPriceET, meSalePriceET, meNumColorsET, meNumStoresET;
-
     boolean isDataLoaded = false;
     String dataString;
     JSONArray manualEntries;
-
     LinkedList<Product> productsList = new LinkedList<Product>();
+
+    public static HashMap<String, Drawable> getImageNames(Context context){
+        if (imagesMap == null) {
+            imagesMap = new HashMap<String, Drawable>();
+        }
+        imagesMap.put("product_0.png", context.getResources().getDrawable(R.drawable.product_0));
+        imagesMap.put("product_1.png", context.getResources().getDrawable(R.drawable.product_1));
+        imagesMap.put("product_2.png", context.getResources().getDrawable(R.drawable.product_2));
+        imagesMap.put("product_3.png", context.getResources().getDrawable(R.drawable.product_3));
+        imagesMap.put("product_4.png", context.getResources().getDrawable(R.drawable.product_4));
+        imagesMap.put("product_5.png", context.getResources().getDrawable(R.drawable.product_5));
+        imagesMap.put("product_6.png", context.getResources().getDrawable(R.drawable.product_6));
+        imagesMap.put("product_7.png", context.getResources().getDrawable(R.drawable.product_7));
+        imagesMap.put("product_8.png", context.getResources().getDrawable(R.drawable.product_8));
+        imagesMap.put("product_9.png", context.getResources().getDrawable(R.drawable.product_9));
+
+        return imagesMap;
+    }
+
+    public static HashMap<String, Integer> getImageNamesRes(Context context){
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+        map.put("product_0.png", R.drawable.product_0);
+        map.put("product_1.png", R.drawable.product_1);
+        map.put("product_2.png", R.drawable.product_2);
+        map.put("product_3.png", R.drawable.product_3);
+        map.put("product_4.png", R.drawable.product_4);
+        map.put("product_5.png", R.drawable.product_5);
+        map.put("product_6.png", R.drawable.product_6);
+        map.put("product_7.png", R.drawable.product_7);
+        map.put("product_8.png", R.drawable.product_8);
+        map.put("product_9.png", R.drawable.product_9);
+
+        return map;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -343,6 +374,7 @@ public class FirstActivity extends Activity {
                     }
                 }
                 Utilities.hideKeyboard(getApplicationContext(), createDatabaseBUT);
+                Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
                 createDatabase(dataString);
                 showProductBUT.setEnabled(true);
                 Toast.makeText(getApplicationContext(), "Database created!", Toast.LENGTH_SHORT).show();
@@ -394,6 +426,7 @@ public class FirstActivity extends Activity {
                 clearManualFields();
             }
         });
+
     }
 
     private void clearManualFields() {
@@ -432,8 +465,9 @@ public class FirstActivity extends Activity {
 
             ProductDatabaseHelper productDatabaseHelper = new ProductDatabaseHelper(getApplicationContext());
             SQLiteDatabase db = productDatabaseHelper.getWritableDatabase();
+            ProductDatabaseHelper.dropDB(db);
 
-            for (int i=0;i<numFoundProducts;i++){
+            for (int i = 0; i < numFoundProducts; i++) {
                 Product newProduct = new Product(productsArray.getJSONObject(i));
                 //Log.wtf("FirstActivity","adding "+newProduct.toString());
                 ProductDatabaseHelper.insertItemIntoDB(newProduct, db);
@@ -441,7 +475,7 @@ public class FirstActivity extends Activity {
 
             database = ProductDatabaseHelper.getWholeDatabase(db);
             LinkedList<Product> badEntries = new LinkedList<Product>();
-            for(Product product: database){
+            for (Product product : database) {
                 if (product.getName() != null) {
                     Log.wtf("FirstActivity123", product.toString());
                 } else {
@@ -453,7 +487,7 @@ public class FirstActivity extends Activity {
                 database.remove(product);
             }
 
-            //at this point database is the winner, all good entries hopefully.
+            //at this point database is the winner, all good entries & right order.
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -462,20 +496,22 @@ public class FirstActivity extends Activity {
         return database;
     }
 
-    private LinkedList<String> getImageNames(){
-        LinkedList<String> imageNames = new LinkedList<String>();
-        imageNames.add("1");
-        imageNames.add("2");
-        imageNames.add("3");
-        imageNames.add("4");
-        imageNames.add("5");
-        imageNames.add("6");
-        imageNames.add("7");
-        imageNames.add("8");
-        imageNames.add("9");
-        imageNames.add("0");
+    private HashMap<String, Drawable> getImageNames() {
+        if (imagesMap == null) {
+            imagesMap = new HashMap<String, Drawable>();
+        }
+        imagesMap.put("product_0.png", getResources().getDrawable(R.drawable.product_0));
+        imagesMap.put("product_1.png", getResources().getDrawable(R.drawable.product_1));
+        imagesMap.put("product_2.png", getResources().getDrawable(R.drawable.product_2));
+        imagesMap.put("product_3.png", getResources().getDrawable(R.drawable.product_3));
+        imagesMap.put("product_4.png", getResources().getDrawable(R.drawable.product_4));
+        imagesMap.put("product_5.png", getResources().getDrawable(R.drawable.product_5));
+        imagesMap.put("product_6.png", getResources().getDrawable(R.drawable.product_6));
+        imagesMap.put("product_7.png", getResources().getDrawable(R.drawable.product_7));
+        imagesMap.put("product_8.png", getResources().getDrawable(R.drawable.product_8));
+        imagesMap.put("product_9.png", getResources().getDrawable(R.drawable.product_9));
 
-        return imageNames;
+        return imagesMap;
     }
 
     private JSONArray runRandomizer(int numEntries, int numStores) {
@@ -486,7 +522,7 @@ public class FirstActivity extends Activity {
             int stockMin = 0;
             int stockMax = 15;
 
-            LinkedList<String> imageNames = getImageNames();
+            // LinkedList<String> imageNames = getImageNames();
 
             JSONArray itemsArray = new JSONArray();
             for (int i = 0; i < numEntries; i++) {
@@ -503,7 +539,8 @@ public class FirstActivity extends Activity {
                 item.put(FIELD_REGULAR_PRICE, randomRegular);
                 item.put(FIELD_SALE_PRICE, randomSale);
                 int randomPicID = Utilities.getRandomIntInRange(0, 9);
-                item.put(FIELD_PRODUCT_IMAGE, "imagename_" + randomPicID);
+                item.put(FIELD_PRODUCT_IMAGE, "product_" + randomPicID + ".png");
+
 
                 int numColorsToPick = 4;
                 String[] colors = {"Red","Blue","Green","Black","Yellow","Orange","Gold","Silver","Chrome"};
@@ -552,7 +589,7 @@ public class FirstActivity extends Activity {
             int stockMin = 0;
             int stockMax = 15;
 
-            LinkedList<String> imageNames = getImageNames();
+            //LinkedList<String> imageNames = getImageNames();
             int randomPicID = Utilities.getRandomIntInRange(0, 9);
             int startId = 0;
             if (productsList != null) {
@@ -566,7 +603,7 @@ public class FirstActivity extends Activity {
 
             item.put(FIELD_REGULAR_PRICE, regPrice);
             item.put(FIELD_SALE_PRICE, salePrice);
-            item.put(FIELD_PRODUCT_IMAGE, "imagename_" + randomPicID);
+            item.put(FIELD_PRODUCT_IMAGE, "product_" + randomPicID + ".png");
 
             String[] colors = {"Red", "Blue", "Green", "Black", "Yellow", "Orange", "Gold", "Silver", "Chrome"};
             JSONArray colorsArray = new JSONArray();

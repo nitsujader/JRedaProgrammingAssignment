@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import org.json.JSONArray;
 
@@ -36,7 +35,7 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         contentValues.put(ProductDatabase.FIELD_PRODUCT_IMAGE, newProduct.getProductImage());
         contentValues.put(ProductDatabase.FIELD_COLORS, stringArrayToJSONArray(newProduct.getColors()).toString());
         contentValues.put(ProductDatabase.FIELD_STORES, newProduct.getStoresJSONArray().toString());
-        Log.wtf("DB HELPER", "inserting " + newProduct.getName());
+        //Log.wtf("DB HELPER", "inserting " + newProduct.getName());
         return database.insert(ProductDatabase.ProductEntry.TABLE_NAME, null, contentValues);//returns row id
     }
 
@@ -62,26 +61,31 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
                 null,
                 sortOrder);
 
+        //add products while i can still find data
         LinkedList<Product> products = new LinkedList<Product>();
-
         while (cursor.getPosition() < cursor.getCount()) {
             Product product = new Product(cursor);
             products.add(product);
             cursor.moveToNext();
         }
 
+        //remove header row if it came through
         LinkedList<Product> badEntries = new LinkedList<Product>();
         for (Product product : products) {
-            if (product.getName() != null) {
-                Log.wtf("FirstActivity123", product.toString());
-            } else {
+            if (product.getName() == null) {
                 badEntries.add(product);
-                Log.wtf("FirstActivity123", "removing null entry");
             }
         }
         for (Product product : badEntries) {
             products.remove(product);
         }
+
+        //This will unreverse the list
+        LinkedList<Product> tempReverse = new LinkedList<Product>();
+        for (int i = products.size() - 1; i >= 0; i--) {
+            tempReverse.add(products.get(i));
+        }
+        products = tempReverse;
 
         return products;
     }
