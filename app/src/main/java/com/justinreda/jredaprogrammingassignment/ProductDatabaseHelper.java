@@ -18,6 +18,7 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "ProductsDatabase.db";
+    public static SQLiteDatabase liteDatabase;
 
     public ProductDatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -60,40 +61,27 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
                 null,
                 null,
                 sortOrder);
-        //Log.wtf("PRODUCTDBHELPER","rows = "+cursor.getCount());
 
         LinkedList<Product> products = new LinkedList<Product>();
-        //Log.wtf("PRODUCTDBHELPER","first "+cursor.moveToFirst());
-        /*for (int i = 0; i<cursor.getCount();i++){
-            Log.wtf("PRODUCTDBHELPER","Cursor POS1 "+cursor.getPosition());
-            Log.wtf("PRODUCTDBHELPER","Cursor POS11 "+cursor.getColumnName(1));
-            Log.wtf("PRODUCTDBHELPER","Cursor POS111 "+cursor.getString(1));
 
-            Product product = new Product(cursor);
-            products.add(product);
-            //Log.wtf("FIRSTACTIVITY","name under cursor "+cursor.getString(cursor.getColumnIndex(ProductDatabase.ProductEntry.COLUMN_NAME_NAME)));
-            //Log.wtf("FIRSTACTIVITY","next " +cursor.moveToNext());
-
-            cursor.moveToPosition(i);
-        }*/
         while (cursor.getPosition() < cursor.getCount()) {
             Product product = new Product(cursor);
             products.add(product);
-            //Log.wtf("PRODUCTDBHELPER","Cursor POS1 "+cursor.getPosition());
-            //Log.wtf("PRODUCTDBHELPER","Cursor POS11 "+cursor.getColumnName(1));
-            //Log.wtf("PRODUCTDBHELPER","Cursor POS111 "+cursor.getString(1));
             cursor.moveToNext();
         }
-        /*Log.wtf("PRODUCTDBHELPER","Cursor POS2 "+cursor.getPosition());
-        Log.wtf("PRODUCTDBHELPER","Cursor POS22 "+cursor.getColumnName(1));
-        Log.wtf("PRODUCTDBHELPER","Cursor POS222 "+cursor.getString(1));
 
-        Product product2 = new Product(cursor);
-        products.add(product2);*/
-        /*Product product2 = new Product(cursor);
-        products.add(product2);
-        Log.wtf("FIRSTACTIVITY","name under cursor "+cursor.getString(cursor.getColumnIndex(ProductDatabase.ProductEntry.COLUMN_NAME_NAME)));
-        Log.wtf("FIRSTACTIVITY","next " +cursor.moveToNext());*/
+        LinkedList<Product> badEntries = new LinkedList<Product>();
+        for (Product product : products) {
+            if (product.getName() != null) {
+                Log.wtf("FirstActivity123", product.toString());
+            } else {
+                badEntries.add(product);
+                Log.wtf("FirstActivity123", "removing null entry");
+            }
+        }
+        for (Product product : badEntries) {
+            products.remove(product);
+        }
 
         return products;
     }
@@ -112,10 +100,19 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return jsonArray;
     }
 
+    public static void dropDB(SQLiteDatabase database) {
+        if (database != null) {
+            database.execSQL(ProductDatabase.SQL_DROP_ENTRIES);
+            database.execSQL(ProductDatabase.SQL_CREATE_ENTRIES);
+            liteDatabase = database;
+        }
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(ProductDatabase.SQL_DROP_ENTRIES);
         db.execSQL(ProductDatabase.SQL_CREATE_ENTRIES);
+        liteDatabase = db;
     }
 
     @Override
