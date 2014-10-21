@@ -1,6 +1,7 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -8,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 
 /**
  * Created by Justin on 10/19/2014.
@@ -54,17 +54,19 @@ public class Product {
                 JSONObject storeObject = storez.getJSONObject(j);
                 stores.put(storeObject.getString(FIELD_STORES_NUMBER),storeObject.getInt(FIELD_STORES_STOCK));
             }
-            Log.wtf("PROD","storezzz "+stores.keySet().iterator());
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public Product(Cursor cursor) {
-        Log.wtf("PRODUCT", "id index "+cursor.moveToFirst());
+        /*for (String name: cursor.getColumnNames()){
+            Log.wtf("PRODUCT", "id CN "+cursor.moveToFirst());
+            Log.wtf("PRODUCT", "name index "+cursor.getColumnIndexOrThrow(FIELD_NAME));
+        }*/
         try {
-            this.id = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
-            this.name = cursor.getString(cursor.getColumnIndex(FIELD_NAME));
+            this.id = cursor.getInt(0);
+            this.name = cursor.getString(cursor.getColumnIndexOrThrow(FIELD_NAME));
             this.description = cursor.getString(cursor.getColumnIndex(FIELD_DESCRIPTION));
             this.regularPrice = cursor.getDouble(cursor.getColumnIndex(FIELD_REGULAR_PRICE));
             this.salePrice = cursor.getDouble(cursor.getColumnIndex(FIELD_SALE_PRICE));
@@ -76,14 +78,16 @@ public class Product {
             }
             this.stores = new Hashtable<String, Integer>();
             JSONArray storez = new JSONArray(cursor.getString(cursor.getColumnIndex(FIELD_STORES)));
-            Log.wtf("PRODUCT","stores "+storez.toString());
+            //Log.wtf("PRODUCT","stores "+storez.toString());
             for(int j=0; j<storez.length();j++){
                 JSONObject storeObject = storez.getJSONObject(j);
                 this.stores.put(FIELD_STORES_NUMBER,storeObject.getInt(FIELD_STORES_STOCK));
             }
 
         } catch (JSONException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
+        } catch (CursorIndexOutOfBoundsException e) {
+            e.printStackTrace();
         }
     }
 
@@ -147,6 +151,10 @@ public class Product {
         return stores;
     }
 
+    public void setStores(Hashtable<String, Integer> stores) {
+        this.stores = stores;
+    }
+
     public JSONArray getStoresJSONArray() {
 
         try {
@@ -159,16 +167,12 @@ public class Product {
                 arrayOut.put(tempObject);
             }
 
-            Log.wtf("PRODUCT","storez "+arrayOut.toString());
+            Log.wtf("PRODUCT", "storez " + arrayOut.toString());
             return arrayOut;
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public void setStores(Hashtable<String, Integer> stores) {
-        this.stores = stores;
     }
 
     @Override

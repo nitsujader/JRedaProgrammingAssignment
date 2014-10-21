@@ -1,7 +1,6 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -82,6 +81,8 @@ public class FirstActivity extends Activity {
         setContentView(R.layout.activity_first);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        getApplicationContext().deleteDatabase("ProductsDatabase.db");
 
         initializeUI();
     }
@@ -319,7 +320,7 @@ public class FirstActivity extends Activity {
             @Override
             public void onClick(View v) {
                 createDatabase(dataString);
-                Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
+//                Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
                 showProductBUT.setEnabled(true);
                 Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT).show();
             }
@@ -331,7 +332,8 @@ public class FirstActivity extends Activity {
         storesDictionary.*/
     }
 
-    private void createDatabase(String dataIn){
+    private LinkedList<Product> createDatabase(String dataIn) {
+        LinkedList<Product> database = null;
         try {
             JSONArray productsArray = new JSONArray(dataIn);
             int numFoundProducts = productsArray.length();
@@ -341,19 +343,30 @@ public class FirstActivity extends Activity {
 
             for (int i=0;i<numFoundProducts;i++){
                 Product newProduct = new Product(productsArray.getJSONObject(i));
-                Log.wtf("FirstActivity","adding "+newProduct.toString());
+                //Log.wtf("FirstActivity","adding "+newProduct.toString());
                 ProductDatabaseHelper.insertItemIntoDB(newProduct, db);
             }
 
-            LinkedList<Product> database = ProductDatabaseHelper.getWholeDatabase(db);
+            database = ProductDatabaseHelper.getWholeDatabase(db);
+            LinkedList<Product> badEntries = new LinkedList<Product>();
             for(Product product: database){
-                Log.wtf("FirstActivity123",product.toString());
+                if (product.getName() != null) {
+                    Log.wtf("FirstActivity123", product.toString());
+                } else {
+                    badEntries.add(product);
+                    Log.wtf("FirstActivity123", "removing null entry");
+                }
             }
+            for (Product product : badEntries) {
+                database.remove(product);
+            }
+
+            //at this point database is the winner, all good entries hopefully.
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        return database;
     }
 
 
@@ -371,7 +384,7 @@ public class FirstActivity extends Activity {
         imageNames.add("0");
 
         for (String name: imageNames){
-            Log.wtf("FirstActivity",name);
+            //Log.wtf("FirstActivity",name);
         }
 
         return imageNames;

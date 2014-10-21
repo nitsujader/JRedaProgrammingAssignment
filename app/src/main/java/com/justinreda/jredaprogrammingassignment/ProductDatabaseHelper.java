@@ -21,38 +21,25 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
 
     public ProductDatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        //context.deleteDatabase(DATABASE_NAME);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(ProductDatabase.SQL_CREATE_ENTRIES);
+    public static long insertItemIntoDB(Product newProduct, SQLiteDatabase database) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ProductDatabase.FIELD_ID, newProduct.getId());
+        contentValues.put(ProductDatabase.FIELD_NAME, newProduct.getName());
+        contentValues.put(ProductDatabase.FIELD_DESCRIPTION, newProduct.getDescription());
+        contentValues.put(ProductDatabase.FIELD_REGULAR_PRICE, newProduct.getRegularPrice());
+        contentValues.put(ProductDatabase.FIELD_SALE_PRICE, newProduct.getSalePrice());
+        contentValues.put(ProductDatabase.FIELD_PRODUCT_IMAGE, newProduct.getProductImage());
+        contentValues.put(ProductDatabase.FIELD_COLORS, stringArrayToJSONArray(newProduct.getColors()).toString());
+        contentValues.put(ProductDatabase.FIELD_STORES, newProduct.getStoresJSONArray().toString());
+        Log.wtf("DB HELPER", "inserting " + newProduct.getName());
+        return database.insert(ProductDatabase.ProductEntry.TABLE_NAME, null, contentValues);//returns row id
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(ProductDatabase.SQL_DROP_ENTRIES);
-        onCreate(db);
-    }
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion){
-        onUpgrade(db,oldVersion,newVersion);
-    }
-
-    public static long insertItemIntoDB(Product newProduct, SQLiteDatabase database){
-
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(ProductDatabase.FIELD_ID, newProduct.getId());
-            contentValues.put(ProductDatabase.FIELD_NAME, newProduct.getName());
-            contentValues.put(ProductDatabase.FIELD_DESCRIPTION, newProduct.getDescription());
-            contentValues.put(ProductDatabase.FIELD_REGULAR_PRICE, newProduct.getRegularPrice());
-            contentValues.put(ProductDatabase.FIELD_SALE_PRICE, newProduct.getSalePrice());
-            contentValues.put(ProductDatabase.FIELD_PRODUCT_IMAGE, newProduct.getProductImage());
-            contentValues.put(ProductDatabase.FIELD_COLORS, stringArrayToJSONArray(newProduct.getColors()).toString());
-            contentValues.put(ProductDatabase.FIELD_STORES, newProduct.getStoresJSONArray().toString());
-            Log.wtf("DB HELPER","inserting "+newProduct.getName());
-            return database.insert(ProductDatabase.ProductEntry.TABLE_NAME, null, contentValues);//returns row id
-    }
-
-    public static LinkedList<Product> getWholeDatabase(SQLiteDatabase database){
+    public static LinkedList<Product> getWholeDatabase(SQLiteDatabase database) {
         String[] columnsToReturn = {
                 ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID,
                 ProductDatabase.ProductEntry.COLUMN_NAME_NAME,
@@ -63,9 +50,9 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
                 ProductDatabase.ProductEntry.COLUMN_NAME_COLORS,
                 ProductDatabase.ProductEntry.COLUMN_NAME_STORES};
 
-        String sortOrder = ProductDatabase.ProductEntry.COLUMN_NAME_NAME + " DESC";
-
-        Cursor cursor = database.query(
+        String sortOrder = ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID + " DESC";
+        Cursor cursor = null;
+        cursor = database.query(
                 ProductDatabase.ProductEntry.TABLE_NAME,
                 columnsToReturn,
                 null,//columns for where
@@ -73,34 +60,71 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
                 null,
                 null,
                 sortOrder);
-        String[] columnNames = cursor.getColumnNames();
-        /*for(String cName:columnNames){
-            Log.wtf("PRODUCTDBHELPER",cName);
-        }*/
-
-        Log.wtf("PRODUCTDBHELPER","rows = "+cursor.getCount());
+        //Log.wtf("PRODUCTDBHELPER","rows = "+cursor.getCount());
 
         LinkedList<Product> products = new LinkedList<Product>();
-        for (int i = 0; i<cursor.getCount();i++){
+        //Log.wtf("PRODUCTDBHELPER","first "+cursor.moveToFirst());
+        /*for (int i = 0; i<cursor.getCount();i++){
+            Log.wtf("PRODUCTDBHELPER","Cursor POS1 "+cursor.getPosition());
+            Log.wtf("PRODUCTDBHELPER","Cursor POS11 "+cursor.getColumnName(1));
+            Log.wtf("PRODUCTDBHELPER","Cursor POS111 "+cursor.getString(1));
+
             Product product = new Product(cursor);
             products.add(product);
+            //Log.wtf("FIRSTACTIVITY","name under cursor "+cursor.getString(cursor.getColumnIndex(ProductDatabase.ProductEntry.COLUMN_NAME_NAME)));
+            //Log.wtf("FIRSTACTIVITY","next " +cursor.moveToNext());
+
+            cursor.moveToPosition(i);
+        }*/
+        while (cursor.getPosition() < cursor.getCount()) {
+            Product product = new Product(cursor);
+            products.add(product);
+            //Log.wtf("PRODUCTDBHELPER","Cursor POS1 "+cursor.getPosition());
+            //Log.wtf("PRODUCTDBHELPER","Cursor POS11 "+cursor.getColumnName(1));
+            //Log.wtf("PRODUCTDBHELPER","Cursor POS111 "+cursor.getString(1));
             cursor.moveToNext();
         }
+        /*Log.wtf("PRODUCTDBHELPER","Cursor POS2 "+cursor.getPosition());
+        Log.wtf("PRODUCTDBHELPER","Cursor POS22 "+cursor.getColumnName(1));
+        Log.wtf("PRODUCTDBHELPER","Cursor POS222 "+cursor.getString(1));
+
+        Product product2 = new Product(cursor);
+        products.add(product2);*/
+        /*Product product2 = new Product(cursor);
+        products.add(product2);
+        Log.wtf("FIRSTACTIVITY","name under cursor "+cursor.getString(cursor.getColumnIndex(ProductDatabase.ProductEntry.COLUMN_NAME_NAME)));
+        Log.wtf("FIRSTACTIVITY","next " +cursor.moveToNext());*/
 
         return products;
     }
 
-    public static void deleteItemFromDB(Product foresaken, SQLiteDatabase database){
+    public static void deleteItemFromDB(Product foresaken, SQLiteDatabase database) {
         String selection = ProductDatabase.ProductEntry.COLUMN_NAME_NAME + " LIKE ?";
         String[] selectionArgs = {String.valueOf(foresaken.getName())};
         database.delete(ProductDatabase.ProductEntry.TABLE_NAME, selection, selectionArgs);
     }
 
-    private static JSONArray stringArrayToJSONArray(String[] in){
+    private static JSONArray stringArrayToJSONArray(String[] in) {
         JSONArray jsonArray = new JSONArray();
-        for (int i=0; i<in.length;i++){
+        for (int i = 0; i < in.length; i++) {
             jsonArray.put(in[i]);
         }
         return jsonArray;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(ProductDatabase.SQL_DROP_ENTRIES);
+        db.execSQL(ProductDatabase.SQL_CREATE_ENTRIES);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(ProductDatabase.SQL_DROP_ENTRIES);
+        onCreate(db);
+    }
+
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onUpgrade(db, oldVersion, newVersion);
     }
 }
