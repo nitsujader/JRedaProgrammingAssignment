@@ -42,7 +42,7 @@ public class FirstActivity extends Activity {
     Button createProductBUT;
     Button showProductBUT;
     Button loadFileBUT;
-    Button showFileContentsBUT;
+    Button showContentsBUT;
     Button createDatabaseBUT;
 
     TextView addProductOptionsTV;
@@ -53,7 +53,6 @@ public class FirstActivity extends Activity {
     LinearLayout fromFileOptionsLL;
     LinearLayout internalSystemOptionsLL;
     LinearLayout enterManuallyLL;
-    LinearLayout fromSQLLL;
     LinearLayout[] importOptionsLLs;
 
     RadioGroup createProductsMethodsRG;
@@ -111,21 +110,18 @@ public class FirstActivity extends Activity {
         fromFileLoadFileOptionsButtonRowLL = (LinearLayout) findViewById(R.id.from_file_load_file_options_LL);
         fromFileOptionsLL = (LinearLayout) findViewById(R.id.from_file_options_LL);
         internalSystemOptionsLL = (LinearLayout) findViewById(R.id.internal_randomizer_LL);
-        enterManuallyLL = (LinearLayout) findViewById(R.id.initial_buttons_row_LL);
-        fromSQLLL = (LinearLayout) findViewById(R.id.initial_buttons_row_LL);
+        enterManuallyLL = (LinearLayout) findViewById(R.id.enter_manually_LL);
 
         showFileSV = (ScrollView) findViewById(R.id.from_file_show_contents_SV);
 
         numEntriesET = (EditText) findViewById(R.id.randomizer_entries_ET);
         numStoresET = (EditText) findViewById(R.id.randomizer_stores_ET);
 
-        importOptionsLLs = new LinearLayout[2];
+        importOptionsLLs = new LinearLayout[3];
         importOptionsLLs[0] = fromFileOptionsLL;
         importOptionsLLs[1] = internalSystemOptionsLL;
-       /* //TODO
-        importOptionsLLs[2]=enterManuallyLL;
-        //TODO
-        importOptionsLLs[3]=fromSQLLL;*/
+        importOptionsLLs[2] = enterManuallyLL;
+
 
         createProductsMethodsRG = (RadioGroup) findViewById(R.id.add_product_method_RG);
         createProductsMethodsRG.clearCheck();
@@ -288,10 +284,13 @@ public class FirstActivity extends Activity {
                         });
 
                         break;
-                   /* case 2: // enter manually
+
+                    case R.id.apm_enter_manually_RB: // enter manually
+                        addProductOptionsTV.setText("Please enter values below");
+                        enterManuallyLL.setVisibility(View.VISIBLE);
+
                         break;
-                    case 3: // saved sql db
-                        break;*/
+
                 }
             }
         });

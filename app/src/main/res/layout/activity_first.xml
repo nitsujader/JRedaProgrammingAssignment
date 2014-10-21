@@ -59,7 +59,7 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:visibility="gone">
 
-            <LinearLayout
+                <LinearLayout
                     android:id="@+id/add_product_method_LL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -101,13 +101,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/enter_manually" />
-
-                        <RadioButton
-                            android:id="@+id/apm_sql_db_RB"
-                            style="@style/TextViewNormal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/from_sql_db" />
                     </RadioGroup>
                 </LinearLayout>
 
@@ -183,6 +176,89 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Run" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/enter_manually_LL"
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <EditText
+                            android:id="@+id/manual_product_name_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Name"
+                            android:inputType="textPersonName" />
+
+                        <EditText
+                            android:id="@+id/manual_product_description_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Description"
+                            android:inputType="text" />
+
+                        <EditText
+                            android:id="@+id/manual_product_reg_price_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Regular Price"
+                            android:inputType="numberDecimal" />
+
+                        <EditText
+                            android:id="@+id/manual_product_sale_price_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Sale Price"
+                            android:inputType="numberDecimal" />
+
+                        <TextView
+                            style="@style/TextViewCode"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Available colors and store stock information will be automatically populated based on input below" />
+
+                        <EditText
+                            android:id="@+id/manual_product_num_colors_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Number of colors"
+                            android:inputType="number" />
+
+                        <EditText
+                            android:id="@+id/manual_product_num_stores_ET"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Number of stores"
+                            android:inputType="number" />
+
+                        <LinearLayout
+                            style="?android:buttonBarStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/manual_product_add_BUT"
+                                style="?android:borderlessButtonStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Add" />
+
+                            <Button
+                                android:id="@+id/manual_product_new_BUT"
+                                style="?android:borderlessButtonStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="New" />
+                        </LinearLayout>
+
                     </LinearLayout>
 
                 </LinearLayout> <!--end add product methods ll-->
@@ -267,7 +343,7 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:visibility="gone">
 
-            <TextView
+                <TextView
                     style="@style/TextViewTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
