@@ -2,7 +2,6 @@ package com.justinreda.jredaprogrammingassignment;
 
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +13,8 @@ import java.util.LinkedList;
 
 /**
  * Created by Justin on 10/19/2014.
+ *
+ * Product class for each item in the database
  */
 public class Product implements Serializable {
 
@@ -87,7 +88,6 @@ public class Product implements Serializable {
             }
             this.stores = new Hashtable<String, Integer>();
             JSONArray storez = new JSONArray(cursor.getString(cursor.getColumnIndex(FIELD_STORES)));
-            Log.wtf("PROD storez " + storez.length(), storez.toString());
             for (int j = 0; j < storez.length(); j++) {
                 JSONObject storeObject = storez.getJSONObject(j);
                 this.stores.put(storeObject.getString(FIELD_STORES_NUMBER), storeObject.getInt(FIELD_STORES_STOCK));
