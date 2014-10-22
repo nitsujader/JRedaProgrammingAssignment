@@ -87,6 +87,43 @@ public class Product implements Serializable {
         }
     }
 
+    public void removeStore(String storeName) {
+        if (this.stores.containsKey(storeName)) {
+            this.stores.remove(storeName);
+        }
+    }
+
+    public void updateStore(String storeName, int newValue) {
+        if (this.stores.containsKey(storeName)) {
+            this.stores.put(storeName, newValue);
+        }
+    }
+
+    public void addStore(String storeName, int newValue) {
+        this.stores.put(storeName, newValue);
+    }
+
+    public void addColor(String colorName) {
+        String[] newColors = new String[this.colors.length + 1];
+        for (int i = 0; i < this.colors.length; i++) {
+            newColors[i] = colors[i];
+        }
+        newColors[this.colors.length] = colorName;
+        setColors(newColors);
+    }
+
+    public void removeColor(String colorName) {
+        String[] newColors = new String[this.colors.length - 1];
+        int index = 0;
+        for (String color : this.colors) {
+            if (!color.matches(colorName)) {
+                newColors[index] = colorName;
+                index++;
+            }
+        }
+        setColors(newColors);
+    }
+
     public int getId() {
         return id;
     }

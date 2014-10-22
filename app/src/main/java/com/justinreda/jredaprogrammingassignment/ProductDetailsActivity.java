@@ -1,7 +1,6 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -48,14 +47,15 @@ public class ProductDetailsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); //animation to make it look nice
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         setContentView(R.layout.activity_product_details);
 
         theProduct = (Product) getIntent().getBundleExtra("data").getSerializable("product");
 
         setupLayout();
-        populateLayout(this, theProduct);
+        populateLayout(theProduct);
 
     }
 
@@ -90,8 +90,7 @@ public class ProductDetailsActivity extends Activity {
 
     }
 
-    private void populateLayout(final Context context, Product product) {
-
+    private void populateLayout(Product product) {
 
         productNameET.setText(product.getName());
         productNameTV.setText(product.getName());
@@ -112,7 +111,6 @@ public class ProductDetailsActivity extends Activity {
         smallProductETIV.setImageResource(drawableHashMap.get(imageName));
         smallProductTVIV.setImageResource(drawableHashMap.get(imageName));
         bigProductIV.setImageResource(drawableHashMap.get(imageName));
-        //bigProductIV.setScaleType(ImageView.ScaleType.FIT_XY);
 
         smallProductTVIV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,7 +143,7 @@ public class ProductDetailsActivity extends Activity {
             public void onClick(View v) {
                 productDetailsTVLL.setVisibility(View.VISIBLE);
                 productDetailsETLL.setVisibility(View.GONE);
-
+                updateLocalProduct();
                 Toast.makeText(getApplicationContext(), "Updated", Toast.LENGTH_SHORT).show();
             }
         });
@@ -170,17 +168,54 @@ public class ProductDetailsActivity extends Activity {
         });
     }
 
+    public void updateLocalProduct() {
+
+        String newName = productNameET.getText().toString();
+        productNameTV.setText(newName);
+        theProduct.setName(newName);
+        String newDescription = productDescriptionET.getText().toString();
+        productDescriptionTV.setText(newDescription);
+        theProduct.setDescription(newDescription);
+
+        String newRegPrice = productRegPriceET.getText().toString();
+        if (newRegPrice.startsWith("$")) newRegPrice = newRegPrice.substring(1);
+        Double newRegDouble = Double.parseDouble(newRegPrice);
+        String newRegStr = Utilities.readDoubleAsCurrency(newRegDouble);
+        productRegPriceTV.setText(newRegStr);
+        productRegPriceET.setText(newRegStr);
+        theProduct.setRegularPrice(newRegDouble);
+
+        String newSalePrice = productSalePriceET.getText().toString();
+        if (newSalePrice.startsWith("$")) newSalePrice = newSalePrice.substring(1);
+        Double newSaleDouble = Double.parseDouble(newSalePrice);
+        String newSaleStr = Utilities.readDoubleAsCurrency(newSaleDouble);
+        productSalePriceTV.setText(newSaleStr);
+        productSalePriceET.setText(newSaleStr);
+        theProduct.setSalePrice(newSaleDouble);
+
+        //TODO: colors
+
+        //TODO: stores
+
+        updateProductInDB();
+    }
+
+    public void updateProductInDB() {
+        ProductDatabaseHelper productDatabaseHelper = new ProductDatabaseHelper(getApplicationContext());
+        final SQLiteDatabase db = productDatabaseHelper.getWritableDatabase();
+        ProductDatabaseHelper.updateItemInDB(theProduct, db);
+    }
 
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); //animation to make it look nice
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @Override
     public boolean onNavigateUp() {
         finish();
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); //animation to make it look nice
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         return true;
     }
 
