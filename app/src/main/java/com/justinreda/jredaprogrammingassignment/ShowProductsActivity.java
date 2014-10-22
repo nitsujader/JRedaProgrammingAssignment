@@ -57,6 +57,31 @@ public class ShowProductsActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        ProductDatabaseHelper productDatabaseHelper = new ProductDatabaseHelper(getApplicationContext());
+        SQLiteDatabase db = productDatabaseHelper.getWritableDatabase();
+        mProductList = ProductDatabaseHelper.getWholeDatabase(db);
+
+        mListView = (ListView) findViewById(R.id.show_products_LV);
+        mAdapter = new ListAdapter();
+        mListView.setAdapter(mAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle baggage = new Bundle();
+                Serializable prod;
+                prod = mProductList.get(position);
+                baggage.putSerializable("product", prod);
+                Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+                intent.putExtra("data", baggage);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
     public void onBackPressed() {
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); //animation to make it look nice

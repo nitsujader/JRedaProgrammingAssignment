@@ -39,6 +39,32 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return database.insert(ProductDatabase.ProductEntry.TABLE_NAME, null, contentValues);//returns row id
     }
 
+    public static long updateItemInDB(Product newProduct, SQLiteDatabase database) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ProductDatabase.FIELD_ID, newProduct.getId());
+        contentValues.put(ProductDatabase.FIELD_NAME, newProduct.getName());
+        contentValues.put(ProductDatabase.FIELD_DESCRIPTION, newProduct.getDescription());
+        contentValues.put(ProductDatabase.FIELD_REGULAR_PRICE, newProduct.getRegularPrice());
+        contentValues.put(ProductDatabase.FIELD_SALE_PRICE, newProduct.getSalePrice());
+        contentValues.put(ProductDatabase.FIELD_PRODUCT_IMAGE, newProduct.getProductImage());
+        contentValues.put(ProductDatabase.FIELD_COLORS, stringArrayToJSONArray(newProduct.getColors()).toString());
+        contentValues.put(ProductDatabase.FIELD_STORES, newProduct.getStoresJSONArray().toString());
+        //Log.wtf("DB HELPER", "inserting " + newProduct.getName());
+        String selection = ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID + " LIKE ?";
+        String[] selectionArgs = {String.valueOf(newProduct.getId())};
+
+        return database.update(ProductDatabase.ProductEntry.TABLE_NAME, contentValues, selection, selectionArgs);//returns row id
+    }
+
+    public static long updateItemInDB(int id, ContentValues contentValues, SQLiteDatabase database) {
+
+        String selection = ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID + " LIKE ?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+        return database.update(ProductDatabase.ProductEntry.TABLE_NAME, contentValues, selection, selectionArgs);//returns row id
+    }
+
     public static LinkedList<Product> getWholeDatabase(SQLiteDatabase database) {
         String[] columnsToReturn = {
                 ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID,
@@ -86,7 +112,7 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
             tempReverse.add(products.get(i));
         }
         products = tempReverse;
-
+        cursor.close();
         return products;
     }
 
@@ -94,6 +120,7 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         String selection = ProductDatabase.ProductEntry.COLUMN_NAME_NAME + " LIKE ?";
         String[] selectionArgs = {String.valueOf(foresaken.getName())};
         database.delete(ProductDatabase.ProductEntry.TABLE_NAME, selection, selectionArgs);
+
     }
 
     private static JSONArray stringArrayToJSONArray(String[] in) {

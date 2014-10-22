@@ -36,5 +36,10 @@
     <string name="show_file_contents">Show File</string>
     <string name="load_file">Load File</string>
     <string name="large_product_image">Large Product Image</string>
+    <string name="small_product_image">Small Product Image</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
+    <string name="default_price">20.00</string>
 
 </resources>
