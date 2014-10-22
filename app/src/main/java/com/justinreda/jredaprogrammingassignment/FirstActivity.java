@@ -1,14 +1,11 @@
 package com.justinreda.jredaprogrammingassignment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +27,6 @@ import java.util.LinkedList;
  */
 public class FirstActivity extends Activity {
 
-    public static HashMap<String, Drawable> imagesMap = new HashMap<String, Drawable>();
     String FIELD_ID = "id";
     String FIELD_NAME = "name";
     String FIELD_DESCRIPTION = "description";
@@ -45,7 +41,6 @@ public class FirstActivity extends Activity {
     Button createProductBUT;
     Button showProductBUT;
     Button loadFileBUT;
-    Button showContentsBUT;
     Button createDatabaseBUT;
     Button showFileBUT;
     Button loadFromAssetsBUT;
@@ -74,25 +69,13 @@ public class FirstActivity extends Activity {
     JSONArray manualEntries;
     LinkedList<Product> productsList = new LinkedList<Product>();
 
-    public static HashMap<String, Drawable> getImageNames(Context context){
-        if (imagesMap == null) {
-            imagesMap = new HashMap<String, Drawable>();
-        }
-        imagesMap.put("product_0.png", context.getResources().getDrawable(R.drawable.product_0));
-        imagesMap.put("product_1.png", context.getResources().getDrawable(R.drawable.product_1));
-        imagesMap.put("product_2.png", context.getResources().getDrawable(R.drawable.product_2));
-        imagesMap.put("product_3.png", context.getResources().getDrawable(R.drawable.product_3));
-        imagesMap.put("product_4.png", context.getResources().getDrawable(R.drawable.product_4));
-        imagesMap.put("product_5.png", context.getResources().getDrawable(R.drawable.product_5));
-        imagesMap.put("product_6.png", context.getResources().getDrawable(R.drawable.product_6));
-        imagesMap.put("product_7.png", context.getResources().getDrawable(R.drawable.product_7));
-        imagesMap.put("product_8.png", context.getResources().getDrawable(R.drawable.product_8));
-        imagesMap.put("product_9.png", context.getResources().getDrawable(R.drawable.product_9));
 
-        return imagesMap;
-    }
-
-    public static HashMap<String, Integer> getImageNamesRes(Context context){
+    /**
+     * Returns the images that the products can use
+     *
+     * @return Hashmap of the product names to the drawables they represent
+     */
+    public static HashMap<String, Integer> getImageNamesRes() {
         HashMap<String, Integer> map = new HashMap<String, Integer>();
 
         map.put("product_0.png", R.drawable.product_0);
@@ -214,7 +197,6 @@ public class FirstActivity extends Activity {
                                 loadFromAssetsBUT.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
 
                                         dataString = Utilities.getStringFromAsset(getApplicationContext(), "" + MOCK_DATA_FILENAME);
                                         if (dataString != null) {
@@ -232,12 +214,10 @@ public class FirstActivity extends Activity {
                                 loadFromWebBUT.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //Toast.makeText(getApplicationContext(), "Loaded!", Toast.LENGTH_SHORT).show();
 
                                         Thread thread = new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                //TODO: show loading dialog
                                                 dataString = Utilities.getStringFromURL("https://www.dropbox.com/s/nb0he3qki83ql73/ExampleData.json?dl=1");
 
                                                 if (dataString != null) {
@@ -324,6 +304,7 @@ public class FirstActivity extends Activity {
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
                                 }
+                                Utilities.writeDownloadsSTRFile(MOCK_DATA_FILENAME, dataString);
                             }
                         });
                         clearManualFields();
@@ -429,6 +410,9 @@ public class FirstActivity extends Activity {
 
     }
 
+    /**
+     * Clear all manual fields for a new product
+     */
     private void clearManualFields() {
         meNameET.setText("");
         meDescriptionET.setText("");
@@ -438,6 +422,11 @@ public class FirstActivity extends Activity {
         meNumStoresET.setText("");
     }
 
+    /**
+     * Make sure all manual entry fields are not null or empty
+     *
+     * @return true if all fields are populated
+     */
     private boolean checkManualFields() {
 
         if (Utilities.etNotNullNotEmpty(meNameET)) {
@@ -457,6 +446,12 @@ public class FirstActivity extends Activity {
         return false;
     }
 
+    /**
+     * Create a database from any form of input information
+     *
+     * @param dataIn the common datastring that all add product methods create (JSONARRAY)
+     * @return list of products added to the database from the input string
+     */
     private LinkedList<Product> createDatabase(String dataIn) {
         LinkedList<Product> database = null;
         try {
@@ -469,18 +464,15 @@ public class FirstActivity extends Activity {
 
             for (int i = 0; i < numFoundProducts; i++) {
                 Product newProduct = new Product(productsArray.getJSONObject(i));
-                //Log.wtf("FirstActivity","adding "+newProduct.toString());
                 ProductDatabaseHelper.insertItemIntoDB(newProduct, db);
             }
 
             database = ProductDatabaseHelper.getWholeDatabase(db);
             LinkedList<Product> badEntries = new LinkedList<Product>();
             for (Product product : database) {
-                if (product.getName() != null) {
-                    Log.wtf("FirstActivity123", product.toString());
-                } else {
+                if (product.getName() == null) {
                     badEntries.add(product);
-                    Log.wtf("FirstActivity123", "removing null entry");
+                    //Log.wtf("FirstActivity", "removing null entry");
                 }
             }
             for (Product product : badEntries) {
@@ -496,24 +488,14 @@ public class FirstActivity extends Activity {
         return database;
     }
 
-    private HashMap<String, Drawable> getImageNames() {
-        if (imagesMap == null) {
-            imagesMap = new HashMap<String, Drawable>();
-        }
-        imagesMap.put("product_0.png", getResources().getDrawable(R.drawable.product_0));
-        imagesMap.put("product_1.png", getResources().getDrawable(R.drawable.product_1));
-        imagesMap.put("product_2.png", getResources().getDrawable(R.drawable.product_2));
-        imagesMap.put("product_3.png", getResources().getDrawable(R.drawable.product_3));
-        imagesMap.put("product_4.png", getResources().getDrawable(R.drawable.product_4));
-        imagesMap.put("product_5.png", getResources().getDrawable(R.drawable.product_5));
-        imagesMap.put("product_6.png", getResources().getDrawable(R.drawable.product_6));
-        imagesMap.put("product_7.png", getResources().getDrawable(R.drawable.product_7));
-        imagesMap.put("product_8.png", getResources().getDrawable(R.drawable.product_8));
-        imagesMap.put("product_9.png", getResources().getDrawable(R.drawable.product_9));
-
-        return imagesMap;
-    }
-
+    /**
+     * Given input number of entries and stores, will automatically generate the number of
+     * requested objects using incremented data.
+     *
+     * @param numEntries number of products to create
+     * @param numStores  number of stores per product
+     * @return the JSON Array of the new created products
+     */
     private JSONArray runRandomizer(int numEntries, int numStores) {
         try {
 
@@ -521,8 +503,6 @@ public class FirstActivity extends Activity {
             double priceMax = 99.99;
             int stockMin = 0;
             int stockMax = 15;
-
-            // LinkedList<String> imageNames = getImageNames();
 
             JSONArray itemsArray = new JSONArray();
             for (int i = 0; i < numEntries; i++) {
@@ -578,6 +558,13 @@ public class FirstActivity extends Activity {
         return null;
     }
 
+    /**
+     * This method augments the manual entry fields. It will automatically assign colors and stores to a manual object
+     *
+     * @param numColors number of colors to add to the object (up to 8)
+     * @param numStores number of stores to add to the object
+     * @return the JSON object of the new product.
+     */
     private JSONObject hybridCreateProduct(int numColors, int numStores) {
         try {
 
@@ -589,7 +576,6 @@ public class FirstActivity extends Activity {
             int stockMin = 0;
             int stockMax = 15;
 
-            //LinkedList<String> imageNames = getImageNames();
             int randomPicID = Utilities.getRandomIntInRange(0, 9);
             int startId = 0;
             if (productsList != null) {

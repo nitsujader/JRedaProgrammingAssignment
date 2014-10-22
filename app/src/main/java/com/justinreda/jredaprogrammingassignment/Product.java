@@ -2,6 +2,7 @@ package com.justinreda.jredaprogrammingassignment;
 
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.util.LinkedList;
 
 /**
  * Created by Justin on 10/19/2014.
@@ -35,6 +37,11 @@ public class Product implements Serializable {
     String[] colors;
     Hashtable<String, Integer> stores;
 
+    /**
+     * Product constructor, build product object based on a JSONObject
+     *
+     * @param product JSONObject of the product that should be created.
+     */
     public Product(JSONObject product) {
         try {
             this.id = product.getInt(FIELD_ID);
@@ -45,20 +52,25 @@ public class Product implements Serializable {
             this.productImage = product.getString(FIELD_PRODUCT_IMAGE);
             JSONArray colorz = product.getJSONArray(FIELD_COLORS);
             this.colors = new String[colorz.length()];
-            for(int i=0; i<colorz.length(); i++){
-                this.colors[i]=colorz.getString(i);
+            for (int i = 0; i < colorz.length(); i++) {
+                this.colors[i] = colorz.getString(i);
             }
             stores = new Hashtable<String, Integer>();
             JSONArray storez = product.getJSONArray(FIELD_STORES);
-            for(int j=0; j<storez.length();j++){
+            for (int j = 0; j < storez.length(); j++) {
                 JSONObject storeObject = storez.getJSONObject(j);
-                stores.put(storeObject.getString(FIELD_STORES_NUMBER),storeObject.getInt(FIELD_STORES_STOCK));
+                stores.put(storeObject.getString(FIELD_STORES_NUMBER), storeObject.getInt(FIELD_STORES_STOCK));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Product constructor, form a product object given an input pointer from a SQLLite DB
+     *
+     * @param cursor cursor containing the Product object
+     */
     public Product(Cursor cursor) {
 
         try {
@@ -70,14 +82,15 @@ public class Product implements Serializable {
             this.productImage = cursor.getString(cursor.getColumnIndex(FIELD_PRODUCT_IMAGE));
             JSONArray colorz = new JSONArray(cursor.getString(cursor.getColumnIndex(FIELD_COLORS)));
             this.colors = new String[colorz.length()];
-            for(int i=0; i<colorz.length(); i++){
-                this.colors[i]=colorz.getString(i);
+            for (int i = 0; i < colorz.length(); i++) {
+                this.colors[i] = colorz.getString(i);
             }
             this.stores = new Hashtable<String, Integer>();
             JSONArray storez = new JSONArray(cursor.getString(cursor.getColumnIndex(FIELD_STORES)));
-            for(int j=0; j<storez.length();j++){
+            Log.wtf("PROD storez " + storez.length(), storez.toString());
+            for (int j = 0; j < storez.length(); j++) {
                 JSONObject storeObject = storez.getJSONObject(j);
-                this.stores.put(FIELD_STORES_NUMBER,storeObject.getInt(FIELD_STORES_STOCK));
+                this.stores.put(storeObject.getString(FIELD_STORES_NUMBER), storeObject.getInt(FIELD_STORES_STOCK));
             }
 
         } catch (JSONException e) {
@@ -86,7 +99,7 @@ public class Product implements Serializable {
             e.printStackTrace();
         }
     }
-
+/*
     public void removeStore(String storeName) {
         if (this.stores.containsKey(storeName)) {
             this.stores.remove(storeName);
@@ -110,18 +123,35 @@ public class Product implements Serializable {
         }
         newColors[this.colors.length] = colorName;
         setColors(newColors);
-    }
+    }*/
 
-    public void removeColor(String colorName) {
-        String[] newColors = new String[this.colors.length - 1];
-        int index = 0;
-        for (String color : this.colors) {
-            if (!color.matches(colorName)) {
-                newColors[index] = colorName;
-                index++;
+    /**
+     * Remove a color from the products list of available colors
+     *
+     * @param colorName String name of color to be removed
+     * @return Updated string array of the product colors
+     */
+    public String[] removeColor(String colorName) {
+        String[] currentColors = this.getColors();
+        LinkedList<String> newArrayLL = new LinkedList<String>();
+        for (String currColor : currentColors) {
+            if (Utilities.strNotNullNotEmpty(colorName) && Utilities.strNotNullNotEmpty(currColor)) {
+                if (!colorName.matches(currColor)) {
+                    newArrayLL.add(currColor);
+                }
             }
         }
-        setColors(newColors);
+
+        int sizeOfArray = newArrayLL.size();
+        String[] newColorArray = new String[sizeOfArray];
+        for (int i = 0; i < sizeOfArray; i++) {
+            if (newArrayLL.getFirst() != null) {
+                newColorArray[i] = newArrayLL.removeFirst();
+            }
+        }
+
+        setColors(newColorArray);
+        return newColorArray;
     }
 
     public int getId() {
@@ -168,10 +198,6 @@ public class Product implements Serializable {
         return productImage;
     }
 
-    public void setProductImage(String productImage) {
-        this.productImage = productImage;
-    }
-
     public String[] getColors() {
         return colors;
     }
@@ -188,6 +214,11 @@ public class Product implements Serializable {
         this.stores = stores;
     }
 
+    /**
+     * Get the store list and stock in JSON form
+     *
+     * @return the JSONArray form of the stores for the selected product
+     */
     public JSONArray getStoresJSONArray() {
 
         try {

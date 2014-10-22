@@ -13,17 +13,28 @@ import java.util.LinkedList;
 /**
  * Created by Justin on 10/19/2014.
  */
-public class ProductDatabaseHelper extends SQLiteOpenHelper{
+public class ProductDatabaseHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "ProductsDatabase.db";
     public static SQLiteDatabase liteDatabase;
 
-    public ProductDatabaseHelper(Context context){
+    /**
+     * Default constructor
+     *
+     * @param context application context
+     */
+    public ProductDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        //context.deleteDatabase(DATABASE_NAME);
     }
 
+    /**
+     * Insert a product into a specific SQLite DB
+     *
+     * @param newProduct product object to be inserted into DB
+     * @param database   database to insert the product into
+     * @return id of new product row
+     */
     public static long insertItemIntoDB(Product newProduct, SQLiteDatabase database) {
 
         ContentValues contentValues = new ContentValues();
@@ -39,6 +50,13 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return database.insert(ProductDatabase.ProductEntry.TABLE_NAME, null, contentValues);//returns row id
     }
 
+    /**
+     * Update a product row in the database. Updates entire object
+     *
+     * @param newProduct the product to be updated (already updated)
+     * @param database   the database to update the product in
+     * @return the row id of the updated product
+     */
     public static long updateItemInDB(Product newProduct, SQLiteDatabase database) {
 
         ContentValues contentValues = new ContentValues();
@@ -57,6 +75,14 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return database.update(ProductDatabase.ProductEntry.TABLE_NAME, contentValues, selection, selectionArgs);//returns row id
     }
 
+    /**
+     * Update an item in the database selectively. Will only update contentValue
+     *
+     * @param id            id of the row (product) to be updated
+     * @param contentValues the field which should be updated
+     * @param database      the database to update the product in
+     * @return row id of the updated product
+     */
     public static long updateItemInDB(int id, ContentValues contentValues, SQLiteDatabase database) {
 
         String selection = ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID + " LIKE ?";
@@ -65,6 +91,12 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return database.update(ProductDatabase.ProductEntry.TABLE_NAME, contentValues, selection, selectionArgs);//returns row id
     }
 
+    /**
+     * Return all Product entries in the SQL database as a List
+     *
+     * @param database database to get all products from
+     * @return LinkedList of Product objects from the SQLLite database
+     */
     public static LinkedList<Product> getWholeDatabase(SQLiteDatabase database) {
         String[] columnsToReturn = {
                 ProductDatabase.ProductEntry.COLUMN_NAME_PRODUCT_ID,
@@ -116,6 +148,12 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return products;
     }
 
+    /**
+     * Remove an item from the SQL database (will not update UI)
+     *
+     * @param foresaken the product to be deleted from the database
+     * @param database  the database to delete a product from
+     */
     public static void deleteItemFromDB(Product foresaken, SQLiteDatabase database) {
         String selection = ProductDatabase.ProductEntry.COLUMN_NAME_NAME + " LIKE ?";
         String[] selectionArgs = {String.valueOf(foresaken.getName())};
@@ -123,6 +161,13 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
 
     }
 
+    /**
+     * Given an input array of strings, will make return it in JSON array form.
+     * This is useful for putting arrays into a DB.
+     *
+     * @param in the string array to convert to JSON
+     * @return the JSON array equivalent of the input string array
+     */
     private static JSONArray stringArrayToJSONArray(String[] in) {
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < in.length; i++) {
@@ -131,6 +176,11 @@ public class ProductDatabaseHelper extends SQLiteOpenHelper{
         return jsonArray;
     }
 
+    /**
+     * Destroy the database and all entries then recreates
+     *
+     * @param database the database to delete
+     */
     public static void dropDB(SQLiteDatabase database) {
         if (database != null) {
             database.execSQL(ProductDatabase.SQL_DROP_ENTRIES);

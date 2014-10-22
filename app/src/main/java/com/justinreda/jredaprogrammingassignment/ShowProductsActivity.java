@@ -94,6 +94,9 @@ public class ShowProductsActivity extends Activity {
         return true;
     }
 
+    /**
+     * List adapter for the products list
+     */
     class ListAdapter extends BaseAdapter {
 
         @Override
@@ -121,7 +124,7 @@ public class ShowProductsActivity extends Activity {
             ViewHolder holder = (ViewHolder) convertView.getTag();
             Product item = mProductList.get(position);
             HashMap<String, Integer> drawableHashMap;
-            drawableHashMap = FirstActivity.getImageNamesRes(getApplicationContext());
+            drawableHashMap = FirstActivity.getImageNamesRes();
 
             String imageName = item.getProductImage();
             holder.iv_icon.setImageResource(drawableHashMap.get(imageName));
@@ -130,6 +133,9 @@ public class ShowProductsActivity extends Activity {
             return convertView;
         }
 
+        /**
+         * View holder class for each row in the list
+         */
         class ViewHolder {
             ImageView iv_icon;
             TextView tv_name;

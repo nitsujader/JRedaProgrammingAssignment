@@ -3,6 +3,7 @@ package com.justinreda.jredaprogrammingassignment;
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Set;
 
 /**
  * Created by Justin on 10/20/2014.
@@ -42,6 +45,10 @@ public class ProductDetailsActivity extends Activity {
     LinearLayout productDetailsTVLL;
     LinearLayout productDetailsETLL;
     LinearLayout productImageLL;
+    LinearLayout productColorsTVLL;
+    LinearLayout productColorsETLL;
+    LinearLayout productStoresTVLL;
+    LinearLayout productStoresETLL;
 
     Product theProduct;
 
@@ -59,6 +66,9 @@ public class ProductDetailsActivity extends Activity {
 
     }
 
+    /**
+     * Assign all layout elements to their XML elements
+     */
     private void setupLayout() {
 
         productDetailsLL = (LinearLayout) findViewById(R.id.product_details_LL);
@@ -88,8 +98,19 @@ public class ProductDetailsActivity extends Activity {
         deleteTVBUT = (Button) findViewById(R.id.product_details_delete_TVBUT);
         deleteETBUT = (Button) findViewById(R.id.product_details_delete_ETBUT);
 
+        productColorsETLL = (LinearLayout) findViewById(R.id.product_details_colors_ETLL);
+        productColorsTVLL = (LinearLayout) findViewById(R.id.product_details_colors_TVLL);
+
+        productStoresETLL = (LinearLayout) findViewById(R.id.product_details_stores_ETLL);
+        productStoresTVLL = (LinearLayout) findViewById(R.id.product_details_stores_TVLL);
     }
 
+    /**
+     * Create the layout and populate all fields with teh data from the local product.
+     * Can also be used an an update function (just pass in updated product)
+     *
+     * @param product the product in which to populate all of the fields.
+     */
     private void populateLayout(Product product) {
 
         productNameET.setText(product.getName());
@@ -106,7 +127,7 @@ public class ProductDetailsActivity extends Activity {
         productSalePriceTV.setText(salePrice);
 
         HashMap<String, Integer> drawableHashMap;
-        drawableHashMap = FirstActivity.getImageNamesRes(getApplicationContext());
+        drawableHashMap = FirstActivity.getImageNamesRes();
         String imageName = product.getProductImage();
         smallProductETIV.setImageResource(drawableHashMap.get(imageName));
         smallProductTVIV.setImageResource(drawableHashMap.get(imageName));
@@ -127,6 +148,86 @@ public class ProductDetailsActivity extends Activity {
             }
         });
 
+        int index = 0;
+        for (final String color : theProduct.getColors()) {
+            final LinearLayout colorETLL = new LinearLayout(getApplicationContext());
+            final LinearLayout colorTVLL = new LinearLayout(getApplicationContext());
+            colorETLL.setOrientation(LinearLayout.HORIZONTAL);
+            colorTVLL.setOrientation(LinearLayout.HORIZONTAL);
+
+            TextView colorNameTV = new TextView(getApplicationContext(), null, R.style.TextViewNormal);
+            TextView colorNameET = new TextView(getApplicationContext(), null, R.style.TextViewNormal);
+            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
+            colorNameTV.setLayoutParams(params);
+            colorNameET.setLayoutParams(params);
+            colorNameET.setText(color);
+            colorNameET.setTextColor(getResources().getColor(R.color.black));
+            colorNameTV.setText(color);
+            colorNameTV.setTextColor(getResources().getColor(R.color.black));
+            colorETLL.addView(colorNameET, 0);
+            colorTVLL.addView(colorNameTV, 0);
+            Button removeColorTV = new Button(getApplicationContext());
+            removeColorTV.setText("Remove");
+            removeColorTV.setBackgroundColor(getResources().getColor(R.color.off_white));
+            removeColorTV.setTextColor(getResources().getColor(R.color.black));
+            removeColorTV.setLayoutParams(params);
+            removeColorTV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    theProduct.removeColor(color);
+                    productColorsETLL.removeView(colorETLL);
+                    productColorsTVLL.removeView(colorTVLL);
+                    theProduct.setColors(theProduct.removeColor(color));
+                    updateProductInDB();
+                }
+            });
+            Button removeColorET = new Button(getApplicationContext());
+            removeColorET.setText("Remove");
+            removeColorET.setBackgroundColor(getResources().getColor(R.color.off_white));
+            removeColorET.setTextColor(getResources().getColor(R.color.black));
+            removeColorET.setLayoutParams(params);
+            removeColorET.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    theProduct.removeColor(color);
+                    productColorsETLL.removeView(colorETLL);
+                    productColorsTVLL.removeView(colorTVLL);
+                    theProduct.setColors(theProduct.removeColor(color));
+                    updateProductInDB();
+                }
+            });
+            colorETLL.addView(removeColorET, 1);
+            colorTVLL.addView(removeColorTV, 1);
+
+            productColorsTVLL.addView(colorTVLL, index);
+            index++;
+        }
+
+        Hashtable<String, Integer> storeHM = theProduct.getStores();
+        Set<String> storesArray = theProduct.getStores().keySet();
+
+        Log.wtf(TAG, "JSON = " + storeHM.size());
+        for (String store : storesArray) {
+            final LinearLayout storesTVLL = new LinearLayout(getApplicationContext());
+            storesTVLL.setOrientation(LinearLayout.HORIZONTAL);
+            TextView storeNameTV = new TextView(getApplicationContext(), null, R.style.TextViewNormal);
+            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
+            storeNameTV.setLayoutParams(params);
+            storeNameTV.setText(store);
+            storeNameTV.setTextColor(getResources().getColor(R.color.black));
+            storesTVLL.addView(storeNameTV, 0);
+
+            TextView storeStockTV = new TextView(getApplicationContext(), null, R.style.TextViewNormal);
+            storeStockTV.setLayoutParams(params);
+            storeStockTV.setText("" + storeHM.get(store));
+            storeStockTV.setTextColor(getResources().getColor(R.color.black));
+            storesTVLL.addView(storeStockTV, 1);
+            productStoresTVLL.addView(storesTVLL);
+
+        }
+
         ProductDatabaseHelper productDatabaseHelper = new ProductDatabaseHelper(getApplicationContext());
         final SQLiteDatabase db = productDatabaseHelper.getWritableDatabase();
 
@@ -144,6 +245,7 @@ public class ProductDetailsActivity extends Activity {
                 productDetailsTVLL.setVisibility(View.VISIBLE);
                 productDetailsETLL.setVisibility(View.GONE);
                 updateLocalProduct();
+                populateLayout(theProduct);
                 Toast.makeText(getApplicationContext(), "Updated", Toast.LENGTH_SHORT).show();
             }
         });
@@ -151,16 +253,14 @@ public class ProductDetailsActivity extends Activity {
         deleteTVBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: ask are you sure
                 Toast.makeText(activity.getApplicationContext(), "delete", Toast.LENGTH_SHORT).show();
                 ProductDatabaseHelper.deleteItemFromDB(theProduct, db);
                 activity.finish();
             }
         });
-        deleteTVBUT.setOnClickListener(new View.OnClickListener() {
+        deleteETBUT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: ask are you sure
                 Toast.makeText(activity.getApplicationContext(), "delete", Toast.LENGTH_SHORT).show();
                 ProductDatabaseHelper.deleteItemFromDB(theProduct, db);
                 activity.finish();
@@ -168,7 +268,11 @@ public class ProductDetailsActivity extends Activity {
         });
     }
 
-    public void updateLocalProduct() {
+    /**
+     * Update the local product from the editable fields.
+     * Effectively the save data command. (will not update SQL)
+     */
+    private void updateLocalProduct() {
 
         String newName = productNameET.getText().toString();
         productNameTV.setText(newName);
@@ -193,14 +297,16 @@ public class ProductDetailsActivity extends Activity {
         productSalePriceET.setText(newSaleStr);
         theProduct.setSalePrice(newSaleDouble);
 
-        //TODO: colors
-
-        //TODO: stores
+        theProduct.setColors(theProduct.getColors());
+        theProduct.setStores(theProduct.getStores());
 
         updateProductInDB();
     }
 
-    public void updateProductInDB() {
+    /**
+     * Update the current product in the database
+     */
+    private void updateProductInDB() {
         ProductDatabaseHelper productDatabaseHelper = new ProductDatabaseHelper(getApplicationContext());
         final SQLiteDatabase db = productDatabaseHelper.getWritableDatabase();
         ProductDatabaseHelper.updateItemInDB(theProduct, db);
